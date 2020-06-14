@@ -1,6 +1,8 @@
 ---
 title: "Bayesian poisoning"
-output: html_notebook
+output:
+  pdf_document: default
+  html_notebook: default
 ---
 The purpose of this code snippet is to demonstrate to the reader how a Naive Bayes (NB) classifier is vulnerable to Bayesian poisoning attacks. Bayesian poisoning is a technique used by email spammers to compromise the effectiveness of Bayesian based spam filters by adding selected words that are unlikely to appear in a spam message. As a result, the spam filter considers the message to be legitimate - a Type II statistical error. We use the R language in our implementation.
 ```{r}
