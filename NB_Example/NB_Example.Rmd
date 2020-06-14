@@ -1,6 +1,10 @@
 ---
 title: "Naive Bayes - An example using R language"
-output: html_notebook
+output:
+  pdf_document: default
+  html_notebook: default
+  html_document:
+    df_print: paged
 ---
 The purpose of this code snippet is to demonstrate to the reader how a Naive Bayes (NB) classifier can be trained on given dataset using the R language. Note that building and deploying NB-enabled systems in industry settings would be more complicated than this simplified example (toy example) and such a discussion is out of the scope of this work. 
 
@@ -10,11 +14,11 @@ The purpose of this code snippet is to demonstrate to the reader how a Naive Bay
 ```{r}
 data(iris) # Attach the Iris dataset to the R environment
 mydata <- iris # Let's rename the dataset as mydata
-dim(mydata) # check dimensions of dataset
+dim(mydata) # check dimensions of mydata
 sapply(mydata, class) # check the data types of each feature
 levels(mydata$Species) # check different levels (values) for each class
-head(dataset) # have a look at top data points in mydata
-summary(dataset) # a summary of class distributions
+head(mydata) # have a look at top data points in mydata
+summary(mydata) # a summary of class distributions
 ```
 **Creating training and validation datasets:** We're going to do an 80/20 partitioning for the training and validation sets. We use the createDataPartition function from the caret package for this purpose.
 ```{r}
@@ -22,7 +26,7 @@ summary(dataset) # a summary of class distributions
 library(caret) #Loading the library
 tr_index <- createDataPartition(mydata$Species, p=0.80, list=FALSE) # List of 80% of the rows
 trainSet <- mydata[tr_index,] # select 80% of the data for the trainSet
-testSet <- dataset[-tr_index,] # Select the remaining 20% of data for testSet
+testSet <- mydata[-tr_index,] # Select the remaining 20% of data for testSet
 ```
 **Building a NB classifier:** Now we will train our NB classifier usinf the above trainSet. We will utilize e1071 package in R for this purpose. Note the priori probabilities when outputting the following lines of code. We get the same priori probabilities for all classes.
 
