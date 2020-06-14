@@ -1,0 +1,41 @@
+---
+title: "Naive Bayes - An example using R language"
+output: html_notebook
+---
+The purpose of this code snippet is to demonstrate to the reader how a Naive Bayes (NB) classifier can be trained on given dataset using the R language. Note that building and deploying NB-enabled systems in industry settings would be more complicated than this simplified example (toy example) and such a discussion is out of the scope of this work. 
+
+**The dataset:** We use the well-known Iris dataset (included with R) for this purpose. It contains four features (measurements) for 150 flowers representing three types of iris plants: Setosa, Versicolor and Virginica. 
+
+**Machine learning (ML) task:** We will train a NB model to identify the plant type based on the four measurements of a given flower. So, our ML task in this problem would be a classification.
+```{r}
+data(iris) # Attach the Iris dataset to the R environment
+mydata <- iris # Let's rename the dataset as mydata
+dim(mydata) # check dimensions of dataset
+sapply(mydata, class) # check the data types of each feature
+levels(mydata$Species) # check different levels (values) for each class
+head(dataset) # have a look at top data points in mydata
+summary(dataset) # a summary of class distributions
+```
+**Creating training and validation datasets:** We're going to do an 80/20 partitioning for the training and validation sets. We use the createDataPartition function from the caret package for this purpose.
+```{r}
+#install.packages("caret") #If the caret package is not installed on your system, uncomment this line to install it first
+library(caret) #Loading the library
+tr_index <- createDataPartition(mydata$Species, p=0.80, list=FALSE) # List of 80% of the rows
+trainSet <- mydata[tr_index,] # select 80% of the data for the trainSet
+testSet <- dataset[-tr_index,] # Select the remaining 20% of data for testSet
+```
+**Building a NB classifier:** Now we will train our NB classifier usinf the above trainSet. We will utilize e1071 package in R for this purpose. Note the priori probabilities when outputting the following lines of code. We get the same priori probabilities for all classes.
+
+```{r}
+#install.packages("e1071") #If the e1071 package is not installed on your system, uncomment this line to install it first
+library(e1071)
+NBclassfier=naiveBayes(Species~., data=trainSet) # Once you call this line, R fits the NB model using trainSet
+print(NBclassfier) # Check the newly fitted model to see if everything is OK.
+```
+
+**Make predictions:** Now let's apply the above model to assign labels for test cases in testSet. Then we create the confusion matrix, a table that is often used to describe the performance of a classifier.
+```{r}
+  testPrediction=predict(NBclassfier, newdata=testSet, type="class") # Assign labels for each test case
+  confusionMatrix(testPrediction, testSet$Species) # Print confusion matrix 
+```
+We can see that the accuracy is 91.3%. It was a small test set, but whether or not that accuracy is sufficient depends on the problem context and is based on many other factors such as the cost of misclassification to the business.
