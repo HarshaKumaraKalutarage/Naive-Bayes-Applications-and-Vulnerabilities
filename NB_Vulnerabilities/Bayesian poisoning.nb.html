@@ -1749,15 +1749,149 @@ summary {
 
 
 <!-- rnb-text-begin -->
-<p>The purpose of this code snippet is to demonstrate to the reader how a Naive Bayes (NB) classifier is vulnerable to Bayesian poisoning attacks. Bayesian poisoning is a technique used by email spammers to compromise the effectiveness of Bayesian based spam filters by adding selected words that are unlikely to appear in a spam message. As a result, the spam filter considers the message to be legitimate - a Type II statistical error. We use the R language in our implementation.</p>
+<p>The purpose of this code snippet to demonstrate the reader how a Naive Bayes (NB) classifier is vulnerable to Bayesian poisoning attacks. Bayesian poisoning is a technique used by email spammers to compromise the effectiveness of Bayesian based spam filters by adding non-spamming (ham) like words at the end of a spam message. As a result, the spam filter considers the message to be legitimate - a Type II statistical error. We use the R language in this implementation.</p>
+<p><strong>The dataset:</strong> We utilise the dataset at <a href="https://www.kaggle.com/venky73/spam-mails-dataset" class="uri">https://www.kaggle.com/venky73/spam-mails-dataset</a> for this purpose.</p>
+<p><strong>Machine learning (ML) task:</strong> Our ML task in this problem would be a classification. First we develop a Bayesin based spam filter using the above email repository (raw emails) and then perform a Bayesian poisoning attack to bypass the security control. To this end, we poison the test data into the spam filter and bypass the security check.</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyMgcmVhZCBkYXRhXG5gYGAifQ== -->
-<pre class="r"><code>## read data</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuIyMgcmVhZCBkYXRhXG5gYGBcbmBgYCJ9 -->
+<p><code>r</code>r ## read data</p>
+<pre><code></code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>Load the dataset to the R environment, and remove the term “Subject:” as it’s common in each message. There is no point of keeping common constant terms like “Subject:” as they don’t have discrimination power.</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubXlEYXRhIDwtIHJlYWQuY3N2KFwic3BhbV9oYW1fZGF0YXNldC5jc3ZcIikgIyByZWFkIHRoZSBkYXRhc2V0XG5teURhdGE8LW15RGF0YVssYyhcImxhYmVsXCIsXCJ0ZXh0XCIpXSAjIHNlbGVjdCB0d28gY29sdW1uc1xubXlEYXRhJHRleHQ8LXN1YnN0cmluZyhteURhdGEkdGV4dCw5KSAjIHJlbW92aW5nIFwiU3ViamVjdDpcIlxuYGBgIn0= -->
+<pre class="r"><code>myData &lt;- read.csv(&quot;spam_ham_dataset.csv&quot;) # read the dataset
+myData&lt;-myData[,c(&quot;label&quot;,&quot;text&quot;)] # select two columns
+myData$text&lt;-substring(myData$text,9) # removing &quot;Subject:&quot;</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>Check the distributions of words (a.k.a document terms) in each class. If the term distributions are different, we can use term frequencies in a message as features to classify the message using an ML model.</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc3BhbU1zZzwtc3Vic2V0KG15RGF0YSxsYWJlbD09XCJzcGFtXCIpXG5oYW1Nc2c8LXN1YnNldChteURhdGEsbGFiZWw9PVwiaGFtXCIpXG53b3JkY2xvdWQoc3BhbU1zZyR0ZXh0LHNjYWxlPWMoNCwuNSksbWluLmZyZXE9NSkgIyBwbG90IGlmIHRoZSB3b3JkIGFwcGVyYXMgbW9yZSB0aGFuIDUgdGltZXMgaW4gdGhlIHNwYW0gbWVzc2FnZXNcbndvcmRjbG91ZChoYW1Nc2ckdGV4dCxzY2FsZT1jKDQsLjUpLG1pbi5mcmVxPTUpICMgcGxvdCBpZiB0aGUgd29yZCBhcHBlcmFzIG1vcmUgdGhhbiA1IHRpbWVzIGluIHRoZSBoYW0gbWVzc2FnZXNcbmBgYCJ9 -->
+<pre class="r"><code>spamMsg&lt;-subset(myData,label==&quot;spam&quot;)
+hamMsg&lt;-subset(myData,label==&quot;ham&quot;)
+wordcloud(spamMsg$text,scale=c(4,.5),min.freq=5) # plot if the word apperas more than 5 times in the spam messages
+wordcloud(hamMsg$text,scale=c(4,.5),min.freq=5) # plot if the word apperas more than 5 times in the ham messages</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>As we can see in the above output, term distributions are different, so we can train a ML model (NB in our case) to classify our messages.</p>
+<p><strong>Building a NB based spam classifier:</strong> Now we will train our NB classifier using the above dataset. We will utilize e1071 package in R for this purpose. To this end we need to follow following steps,</p>
+<p>step 1. We need to create a document term matrix (DTM) - a matrix that describes the frequency of terms occured in our message collection.</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubXlDb3JwdXMgPC0gVkNvcnB1cyhWZWN0b3JTb3VyY2UobXlEYXRhJHRleHQpKVxuXG5teURUTSA8LSBEb2N1bWVudFRlcm1NYXRyaXgobXlDb3JwdXMsIGNvbnRyb2wgPSBsaXN0KFxuICB0b2xvd2VyPVQsXG4gIHJlbW92ZU51bWJlcnM9VCxcbiAgcmVtb3ZlUHVuY3R1YXRpb249VCxcbiAgc3RlbT1UXG4pKVxuYGBgIn0= -->
+<pre class="r"><code>myCorpus &lt;- VCorpus(VectorSource(myData$text))
 
-<div id="rmd-source-code">LS0tCnRpdGxlOiAiQmF5ZXNpYW4gcG9pc29uaW5nIgpvdXRwdXQ6CiAgcGRmX2RvY3VtZW50OiBkZWZhdWx0CiAgaHRtbF9ub3RlYm9vazogZGVmYXVsdAotLS0KVGhlIHB1cnBvc2Ugb2YgdGhpcyBjb2RlIHNuaXBwZXQgaXMgdG8gZGVtb25zdHJhdGUgdG8gdGhlIHJlYWRlciBob3cgYSBOYWl2ZSBCYXllcyAoTkIpIGNsYXNzaWZpZXIgaXMgdnVsbmVyYWJsZSB0byBCYXllc2lhbiBwb2lzb25pbmcgYXR0YWNrcy4gQmF5ZXNpYW4gcG9pc29uaW5nIGlzIGEgdGVjaG5pcXVlIHVzZWQgYnkgZW1haWwgc3BhbW1lcnMgdG8gY29tcHJvbWlzZSB0aGUgZWZmZWN0aXZlbmVzcyBvZiBCYXllc2lhbiBiYXNlZCBzcGFtIGZpbHRlcnMgYnkgYWRkaW5nIHNlbGVjdGVkIHdvcmRzIHRoYXQgYXJlIHVubGlrZWx5IHRvIGFwcGVhciBpbiBhIHNwYW0gbWVzc2FnZS4gQXMgYSByZXN1bHQsIHRoZSBzcGFtIGZpbHRlciBjb25zaWRlcnMgdGhlIG1lc3NhZ2UgdG8gYmUgbGVnaXRpbWF0ZSAtIGEgVHlwZSBJSSBzdGF0aXN0aWNhbCBlcnJvci4gV2UgdXNlIHRoZSBSIGxhbmd1YWdlIGluIG91ciBpbXBsZW1lbnRhdGlvbi4KYGBge3J9CiMjIHJlYWQgZGF0YQpgYGAK</div>
+myDTM &lt;- DocumentTermMatrix(myCorpus, control = list(
+  tolower=T,
+  removeNumbers=T,
+  removePunctuation=T,
+  stem=T
+))</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>Lets use only terms which are frequency &gt;=5 as features in our model building.</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZnJlcVdvcmRzIDwtIGZpbmRGcmVxVGVybXMobXlEVE0sNSlcbm15RFRNIDwtIG15RFRNWyxmcmVxV29yZHNdXG5gYGAifQ== -->
+<pre class="r"><code>freqWords &lt;- findFreqTerms(myDTM,5)
+myDTM &lt;- myDTM[,freqWords]</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>step 2. Split the dataset into train and test sets. Later we going to poison the test set! We’re going to do an 80/20 partitioning for the training and testing. We’ll use the createDataPartition function from the caret package for this purpose.</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxudHJfaW5kZXggPC0gY3JlYXRlRGF0YVBhcnRpdGlvbihteURhdGEkbGFiZWwsIHA9MC44MCwgbGlzdD1GQUxTRSkgIyBMaXN0IG9mIDgwJSBvZiB0aGUgcm93c1xudHJhaW5TZXQgPC0gbXlEYXRhW3RyX2luZGV4LF0gIyBzZWxlY3QgODAlIG9mIHRoZSBkYXRhIGZvciB0aGUgdHJhaW5TZXRcbnRlc3RTZXQgPC0gbXlEYXRhWy10cl9pbmRleCxdICMgU2VsZWN0IHRoZSByZW1haW5pbmcgMjAlIG9mIGRhdGEgZm9yIHRlc3RTZXRcbmBgYCJ9 -->
+<pre class="r"><code>tr_index &lt;- createDataPartition(myData$label, p=0.80, list=FALSE) # List of 80% of the rows
+trainSet &lt;- myData[tr_index,] # select 80% of the data for the trainSet
+testSet &lt;- myData[-tr_index,] # Select the remaining 20% of data for testSet</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>Since we are creating our NB model with the DTM entries, we should obtain corresponding DTM entries for the data in trainSet and testSet.</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubXlEVE1UcmFpbiA8LSBteURUTVt0cl9pbmRleCxdXG5teURUTVRlc3QgPC0gbXlEVE1bLXRyX2luZGV4LF1cbmBgYCJ9 -->
+<pre class="r"><code>myDTMTrain &lt;- myDTM[tr_index,]
+myDTMTest &lt;- myDTM[-tr_index,]</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuY29udmVydF9jb3VudHMgPC0gZnVuY3Rpb24oeCkge1xuICB4IDwtIGlmZWxzZSh4ID4gMCwgMSwgMClcbn1cblxubXlEVE1UcmFpbk5ldyA8LSBhcHBseShteURUTVRyYWluLCBNQVJHSU4gPSAyLGNvbnZlcnRfY291bnRzKVxubXlEVE1UZXN0TmV3IDwtIGFwcGx5KG15RFRNVGVzdCwgTUFSR0lOID0gMiwgY29udmVydF9jb3VudHMpXG5gYGAifQ== -->
+<pre class="r"><code>convert_counts &lt;- function(x) {
+  x &lt;- ifelse(x &gt; 0, 1, 0)
+}
+
+myDTMTrainNew &lt;- apply(myDTMTrain, MARGIN = 2,convert_counts)
+myDTMTestNew &lt;- apply(myDTMTest, MARGIN = 2, convert_counts)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuY2xhc3NpZmllclsyXSR0YWJsZXMkY2FsbFxuXG5gYGAifQ== -->
+<pre class="r"><code>classifier[2]$tables$call
+</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiICAgICAgICAgICBjYWxsXG50cmFpbkxhYmVscyAgICAgICBbLDFdICAgICAgWywyXVxuICAgICAgIGhhbSAgMC4xNTM4NDYxNSAwLjM2MDg2MjZcbiAgICAgICBzcGFtIDAuMDU5MTY2NjcgMC4yMzYwMzQ3XG4ifQ== -->
+<pre><code>           call
+trainLabels       [,1]      [,2]
+       ham  0.15384615 0.3608626
+       spam 0.05916667 0.2360347</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuY29uZnVzaW9uTWF0cml4KHRlc3RQcmVkaWN0LCB0ZXN0U2V0JGxhYmVsKSAjIFByaW50IGNvbmZ1c2lvbiBtYXRyaXggXG5cbmBgYCJ9 -->
+<pre class="r"><code>confusionMatrix(testPredict, testSet$label) # Print confusion matrix 
+</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiQ29uZnVzaW9uIE1hdHJpeCBhbmQgU3RhdGlzdGljc1xuXG4gICAgICAgICAgUmVmZXJlbmNlXG5QcmVkaWN0aW9uIGhhbSBzcGFtXG4gICAgICBoYW0gIDcwOSAgMjA4XG4gICAgICBzcGFtICAyNSAgIDkxXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcbiAgICAgICAgICAgICAgIEFjY3VyYWN5IDogMC43NzQ0ICAgICAgICAgIFxuICAgICAgICAgICAgICAgICA5NSUgQ0kgOiAoMC43NDc3LCAwLjc5OTYpXG4gICAgTm8gSW5mb3JtYXRpb24gUmF0ZSA6IDAuNzEwNiAgICAgICAgICBcbiAgICBQLVZhbHVlIFtBY2MgPiBOSVJdIDogMi4xMTRlLTA2ICAgICAgIFxuICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXG4gICAgICAgICAgICAgICAgICBLYXBwYSA6IDAuMzMwMiAgICAgICAgICBcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFxuIE1jbmVtYXIncyBUZXN0IFAtVmFsdWUgOiA8IDIuMmUtMTYgICAgICAgXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcbiAgICAgICAgICAgIFNlbnNpdGl2aXR5IDogMC45NjU5ICAgICAgICAgIFxuICAgICAgICAgICAgU3BlY2lmaWNpdHkgOiAwLjMwNDMgICAgICAgICAgXG4gICAgICAgICBQb3MgUHJlZCBWYWx1ZSA6IDAuNzczMiAgICAgICAgICBcbiAgICAgICAgIE5lZyBQcmVkIFZhbHVlIDogMC43ODQ1ICAgICAgICAgIFxuICAgICAgICAgICAgIFByZXZhbGVuY2UgOiAwLjcxMDYgICAgICAgICAgXG4gICAgICAgICBEZXRlY3Rpb24gUmF0ZSA6IDAuNjg2NCAgICAgICAgICBcbiAgIERldGVjdGlvbiBQcmV2YWxlbmNlIDogMC44ODc3ICAgICAgICAgIFxuICAgICAgQmFsYW5jZWQgQWNjdXJhY3kgOiAwLjYzNTEgICAgICAgICAgXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcbiAgICAgICAnUG9zaXRpdmUnIENsYXNzIDogaGFtICAgICAgICAgICAgIFxuICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXG4ifQ== -->
+<pre><code>Confusion Matrix and Statistics
+
+          Reference
+Prediction ham spam
+      ham  709  208
+      spam  25   91
+                                          
+               Accuracy : 0.7744          
+                 95% CI : (0.7477, 0.7996)
+    No Information Rate : 0.7106          
+    P-Value [Acc &gt; NIR] : 2.114e-06       
+                                          
+                  Kappa : 0.3302          
+                                          
+ Mcnemar's Test P-Value : &lt; 2.2e-16       
+                                          
+            Sensitivity : 0.9659          
+            Specificity : 0.3043          
+         Pos Pred Value : 0.7732          
+         Neg Pred Value : 0.7845          
+             Prevalence : 0.7106          
+         Detection Rate : 0.6864          
+   Detection Prevalence : 0.8877          
+      Balanced Accuracy : 0.6351          
+                                          
+       'Positive' Class : ham             
+                                          </code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+
+<div id="rmd-source-code">LS0tCnRpdGxlOiAiQmF5ZXNpYW4gcG9pc29uaW5nIgpvdXRwdXQ6CiAgaHRtbF9ub3RlYm9vazogZGVmYXVsdAogIHBkZl9kb2N1bWVudDogZGVmYXVsdAotLS0KVGhlIHB1cnBvc2Ugb2YgdGhpcyBjb2RlIHNuaXBwZXQgdG8gZGVtb25zdHJhdGUgdGhlIHJlYWRlciBob3cgYSBOYWl2ZSBCYXllcyAoTkIpIGNsYXNzaWZpZXIgaXMgdnVsbmVyYWJsZSB0byBCYXllc2lhbiBwb2lzb25pbmcgYXR0YWNrcy4gQmF5ZXNpYW4gcG9pc29uaW5nIGlzIGEgdGVjaG5pcXVlIHVzZWQgYnkgZW1haWwgc3BhbW1lcnMgdG8gY29tcHJvbWlzZSB0aGUgZWZmZWN0aXZlbmVzcyBvZiBCYXllc2lhbiBiYXNlZCBzcGFtIGZpbHRlcnMgYnkgYWRkaW5nIG5vbi1zcGFtbWluZyAoaGFtKSBsaWtlIHdvcmRzIGF0IHRoZSBlbmQgb2YgYSBzcGFtIG1lc3NhZ2UuIEFzIGEgcmVzdWx0LCB0aGUgc3BhbSBmaWx0ZXIgY29uc2lkZXJzIHRoZSBtZXNzYWdlIHRvIGJlIGxlZ2l0aW1hdGUgLSBhIFR5cGUgSUkgc3RhdGlzdGljYWwgZXJyb3IuIFdlIHVzZSB0aGUgUiBsYW5ndWFnZSBpbiB0aGlzIGltcGxlbWVudGF0aW9uLgoKKipUaGUgZGF0YXNldDoqKiBXZSB1dGlsaXNlIHRoZSBkYXRhc2V0IGF0IGh0dHBzOi8vd3d3LmthZ2dsZS5jb20vdmVua3k3My9zcGFtLW1haWxzLWRhdGFzZXQgZm9yIHRoaXMgcHVycG9zZS4gCgoqKk1hY2hpbmUgbGVhcm5pbmcgKE1MKSB0YXNrOioqIE91ciBNTCB0YXNrIGluIHRoaXMgcHJvYmxlbSB3b3VsZCBiZSBhIGNsYXNzaWZpY2F0aW9uLiBGaXJzdCB3ZSBkZXZlbG9wIGEgQmF5ZXNpbiBiYXNlZCBzcGFtIGZpbHRlciB1c2luZyB0aGUgYWJvdmUgZW1haWwgcmVwb3NpdG9yeSAocmF3IGVtYWlscykgYW5kIHRoZW4gcGVyZm9ybSBhIEJheWVzaWFuIHBvaXNvbmluZyBhdHRhY2sgdG8gYnlwYXNzIHRoZSBzZWN1cml0eSBjb250cm9sLiBUbyB0aGlzIGVuZCwgd2UgcG9pc29uIHRoZSB0ZXN0IGRhdGEgaW50byB0aGUgc3BhbSBmaWx0ZXIgYW5kIGJ5cGFzcyB0aGUgc2VjdXJpdHkgY2hlY2suCgpgYGB7cn0Kc2V0LnNlZWQoMTIzNDUpICMgU2V0IHRoZSBzZWVkIHZhbHVlIHNvIHRoYXQgdGhlIHNhbWUgcmVzdWx0IGlzIGFjaGlldmVkIGluIGVhY2ggcmVwbGljYXRpb24KCiNpbnN0YWxsLnBhY2thZ2VzKCd0bScpICMgSW5zdGFsbCB0aGUgcmVxdWlyZWQgbGlicmFyaWVzIGlmIHlvdXIgc3lzdGVtIGRvZXMgbm90IGhhdmUgdGhlbQojaW5zdGFsbC5wYWNrYWdlcygnd29yZGNsb3VkJykKI2luc3RhbGwucGFja2FnZXMoJ2UxMDcxJykKI2luc3RhbGwucGFja2FnZXMoJ2dtb2RlbHMnKQojaW5zdGFsbC5wYWNrYWdlcygnU25vd2JhbGxDJykKCmxpYnJhcnkodG0pICMgTG9hZCB0aGUgbmVjZXNzYXJ5IGxpYnJhcmllcwpsaWJyYXJ5KHdvcmRjbG91ZCkKbGlicmFyeShlMTA3MSkKbGlicmFyeShnbW9kZWxzKQpsaWJyYXJ5KFNub3diYWxsQykKbGlicmFyeShjYXJldCkKCmBgYAoKTG9hZCB0aGUgZGF0YXNldCB0byB0aGUgUiBlbnZpcm9ubWVudCwgYW5kIHJlbW92ZSB0aGUgdGVybSAiU3ViamVjdDoiIGFzIGl0J3MgY29tbW9uIGluIGVhY2ggbWVzc2FnZS4gVGhlcmUgaXMgbm8gcG9pbnQgb2Yga2VlcGluZyBjb21tb24gY29uc3RhbnQgdGVybXMgbGlrZSAiU3ViamVjdDoiIGFzIHRoZXkgZG9uJ3QgaGF2ZSBkaXNjcmltaW5hdGlvbiBwb3dlci4KCmBgYHtyfQpteURhdGEgPC0gcmVhZC5jc3YoInNwYW1faGFtX2RhdGFzZXQuY3N2IikgIyByZWFkIHRoZSBkYXRhc2V0Cm15RGF0YTwtbXlEYXRhWyxjKCJsYWJlbCIsInRleHQiKV0gIyBzZWxlY3QgdHdvIGNvbHVtbnMKbXlEYXRhJHRleHQ8LXN1YnN0cmluZyhteURhdGEkdGV4dCw5KSAjIHJlbW92aW5nICJTdWJqZWN0OiIKYGBgCgpDaGVjayB0aGUgZGlzdHJpYnV0aW9ucyBvZiB3b3JkcyAoYS5rLmEgZG9jdW1lbnQgdGVybXMpIGluIGVhY2ggY2xhc3MuIElmIHRoZSB0ZXJtIGRpc3RyaWJ1dGlvbnMgYXJlIGRpZmZlcmVudCwgd2UgY2FuIHVzZSB0ZXJtIGZyZXF1ZW5jaWVzIGluIGEgbWVzc2FnZSBhcyBmZWF0dXJlcyB0byBjbGFzc2lmeSB0aGUgbWVzc2FnZSB1c2luZyBhbiBNTCBtb2RlbC4KCmBgYHtyfQpzcGFtTXNnPC1zdWJzZXQobXlEYXRhLGxhYmVsPT0ic3BhbSIpCmhhbU1zZzwtc3Vic2V0KG15RGF0YSxsYWJlbD09ImhhbSIpCndvcmRjbG91ZChzcGFtTXNnJHRleHQsc2NhbGU9Yyg0LC41KSxtaW4uZnJlcT01KSAjIHBsb3QgaWYgdGhlIHdvcmQgYXBwZXJhcyBtb3JlIHRoYW4gNSB0aW1lcyBpbiB0aGUgc3BhbSBtZXNzYWdlcwp3b3JkY2xvdWQoaGFtTXNnJHRleHQsc2NhbGU9Yyg0LC41KSxtaW4uZnJlcT01KSAjIHBsb3QgaWYgdGhlIHdvcmQgYXBwZXJhcyBtb3JlIHRoYW4gNSB0aW1lcyBpbiB0aGUgaGFtIG1lc3NhZ2VzCmBgYAoKQXMgd2UgY2FuIHNlZSBpbiB0aGUgYWJvdmUgb3V0cHV0LCB0ZXJtIGRpc3RyaWJ1dGlvbnMgYXJlIGRpZmZlcmVudCwgc28gd2UgY2FuIHRyYWluIGEgTUwgbW9kZWwgKE5CIGluIG91ciBjYXNlKSB0byBjbGFzc2lmeSBvdXIgbWVzc2FnZXMuCgoqKkJ1aWxkaW5nIGEgTkIgYmFzZWQgc3BhbSBjbGFzc2lmaWVyOioqIE5vdyB3ZSB3aWxsIHRyYWluIG91ciBOQiBjbGFzc2lmaWVyIHVzaW5nIHRoZSBhYm92ZSBkYXRhc2V0LiBXZSB3aWxsIHV0aWxpemUgZTEwNzEgcGFja2FnZSBpbiBSIGZvciB0aGlzIHB1cnBvc2UuIFRvIHRoaXMgZW5kIHdlIG5lZWQgdG8gZm9sbG93IGZvbGxvd2luZyBzdGVwcywKCnN0ZXAgMS4gV2UgbmVlZCB0byBjcmVhdGUgYSBkb2N1bWVudCB0ZXJtIG1hdHJpeCAoRFRNKSAtIGEgbWF0cml4IHRoYXQgZGVzY3JpYmVzIHRoZSBmcmVxdWVuY3kgb2YgdGVybXMgb2NjdXJlZCBpbiBvdXIgbWVzc2FnZSBjb2xsZWN0aW9uLgoKYGBge3J9Cm15Q29ycHVzIDwtIFZDb3JwdXMoVmVjdG9yU291cmNlKG15RGF0YSR0ZXh0KSkKCm15RFRNIDwtIERvY3VtZW50VGVybU1hdHJpeChteUNvcnB1cywgY29udHJvbCA9IGxpc3QoCiAgdG9sb3dlcj1ULAogIHJlbW92ZU51bWJlcnM9VCwKICByZW1vdmVQdW5jdHVhdGlvbj1ULAogIHN0ZW09VAopKQpgYGAKCkxldHMgdXNlIG9ubHkgdGVybXMgd2hpY2ggYXJlIGZyZXF1ZW5jeSA+PTUgYXMgZmVhdHVyZXMgaW4gb3VyIG1vZGVsIGJ1aWxkaW5nLgoKYGBge3J9CmZyZXFXb3JkcyA8LSBmaW5kRnJlcVRlcm1zKG15RFRNLDUpCm15RFRNIDwtIG15RFRNWyxmcmVxV29yZHNdCmBgYAoKc3RlcCAyLiBTcGxpdCB0aGUgZGF0YXNldCBpbnRvIHRyYWluIGFuZCB0ZXN0IHNldHMuIExhdGVyIHdlIGdvaW5nIHRvIHBvaXNvbiB0aGUgdGVzdCBzZXQhIFdlJ3JlIGdvaW5nIHRvIGRvIGFuIDgwLzIwIHBhcnRpdGlvbmluZyBmb3IgdGhlIHRyYWluaW5nIGFuZCB0ZXN0aW5nLiBXZSdsbCB1c2UgdGhlIGNyZWF0ZURhdGFQYXJ0aXRpb24gZnVuY3Rpb24gZnJvbSB0aGUgY2FyZXQgcGFja2FnZSBmb3IgdGhpcyBwdXJwb3NlLgoKYGBge3J9CnRyX2luZGV4IDwtIGNyZWF0ZURhdGFQYXJ0aXRpb24obXlEYXRhJGxhYmVsLCBwPTAuODAsIGxpc3Q9RkFMU0UpICMgTGlzdCBvZiA4MCUgb2YgdGhlIHJvd3MKdHJhaW5TZXQgPC0gbXlEYXRhW3RyX2luZGV4LF0gIyBzZWxlY3QgODAlIG9mIHRoZSBkYXRhIGZvciB0aGUgdHJhaW5TZXQKdGVzdFNldCA8LSBteURhdGFbLXRyX2luZGV4LF0gIyBTZWxlY3QgdGhlIHJlbWFpbmluZyAyMCUgb2YgZGF0YSBmb3IgdGVzdFNldApgYGAKClNpbmNlIHdlIGFyZSBjcmVhdGluZyBvdXIgTkIgbW9kZWwgd2l0aCB0aGUgRFRNIGVudHJpZXMsIHdlIHNob3VsZCBvYnRhaW4gY29ycmVzcG9uZGluZyBEVE0gZW50cmllcyBmb3IgdGhlIGRhdGEgaW4gdHJhaW5TZXQgYW5kIHRlc3RTZXQuCgpgYGB7cn0KbXlEVE1UcmFpbiA8LSBteURUTVt0cl9pbmRleCxdCm15RFRNVGVzdCA8LSBteURUTVstdHJfaW5kZXgsXQpgYGAKCgpgYGB7cn0KY29udmVydF9jb3VudHMgPC0gZnVuY3Rpb24oeCkgewogIHggPC0gaWZlbHNlKHggPiAwLCAxLCAwKQp9CgpteURUTVRyYWluTmV3IDwtIGFwcGx5KG15RFRNVHJhaW4sIE1BUkdJTiA9IDIsY29udmVydF9jb3VudHMpCm15RFRNVGVzdE5ldyA8LSBhcHBseShteURUTVRlc3QsIE1BUkdJTiA9IDIsIGNvbnZlcnRfY291bnRzKQpgYGAKCgoKYGBge3J9Cm1zZ0NsYXNzaWZpZXIgPC0gbmFpdmVCYXllcyhteURUTVRyYWluTmV3LCB0cmFpblNldCRsYWJlbCkKY2xhc3NpZmllclsyXSR0YWJsZXMkY2FsbAp0ZXN0UHJlZGljdCA8LSBwcmVkaWN0KG1zZ0NsYXNzaWZpZXIsIG15RFRNVGVzdE5ldykKI0Nyb3NzVGFibGUodGVzdFByZWRpY3QsIHRlc3RMYWJlbHMsICAgICAgICAgICBwcm9wLmNoaXNxID0gRkFMU0UsIHByb3AudCA9IEZBTFNFLCAgICAgICAgICAgZG5uID0gYygncHJlZGljdGVkJywgJ2FjdHVhbCcpKQpgYGAKCmBgYHtyfQpjb25mdXNpb25NYXRyaXgodGVzdFByZWRpY3QsIHRlc3RTZXQkbGFiZWwpICMgUHJpbnQgY29uZnVzaW9uIG1hdHJpeCAKYGBgCgo=</div>
 
 
 
