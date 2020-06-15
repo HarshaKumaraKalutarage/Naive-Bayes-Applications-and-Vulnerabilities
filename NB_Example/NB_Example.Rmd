@@ -6,9 +6,9 @@ output:
   html_document:
     df_print: paged
 ---
-The purpose of this code snippet is to demonstrate to the reader how a Naive Bayes (NB) classifier can be trained on given dataset using the R language. Note that building and deploying NB-enabled systems in industry settings would be more complicated than this simplified example (toy example) and such a discussion is out of the scope of this work. 
+The purpose of this code snippet is to demonstrate to the reader how a Naive Bayes (NB) classiﬁer can be trained on a given dataset using the R language.
 
-**The dataset:** We use the well-known Iris dataset (included with R) for this purpose. It contains four features (measurements) for 150 flowers representing three types of iris plants: Setosa, Versicolor and Virginica. 
+**The dataset:** In order to implement the above code, we use the well-known Iris dataset(included with R) for this purpose. It consists of four features (measurements), namely sepal length, sepal width, petal length, and petal width for 150 ﬂowers.  The dataset contains information about three types of iris plants: Setosa, Versicolor and Virginica.
 
 **Machine learning (ML) task:** We will train a NB model to identify the plant type based on the four measurements of a given flower. So, our ML task in this problem would be a classification.
 ```{r}
@@ -20,7 +20,7 @@ levels(mydata$Species) # check different levels (values) for each class
 head(mydata) # have a look at top data points in mydata
 summary(mydata) # a summary of class distributions
 ```
-**Creating training and validation datasets:** We're going to do an 80/20 partitioning for the training and validation sets. We use the createDataPartition function from the caret package for this purpose.
+**Creating training and validation datasets:** We’re going to construct a 80/20 partitioning for the training and validation sets. We use the createDataPartition function from the caret package for this purpose.
 ```{r}
 #install.packages("caret") #If the caret package is not installed on your system, uncomment this line to install it first
 library(caret) #Loading the library
@@ -28,7 +28,7 @@ tr_index <- createDataPartition(mydata$Species, p=0.80, list=FALSE) # List of 80
 trainSet <- mydata[tr_index,] # select 80% of the data for the trainSet
 testSet <- mydata[-tr_index,] # Select the remaining 20% of data for testSet
 ```
-**Building a NB classifier:** Now we will train our NB classifier usinf the above trainSet. We will utilize e1071 package in R for this purpose. Note the priori probabilities when outputting the following lines of code. We get the same priori probabilities for all classes.
+**Building a NB classifier:** Now we will train our NB classiﬁer using the above trainSet. For this purpose, we will utilize e1071 package in R. Note the priori probabilities when outputting the following lines of code. We get the same priori probabilities for all classes.
 
 ```{r}
 #install.packages("e1071") #If the e1071 package is not installed on your system, uncomment this line to install it first

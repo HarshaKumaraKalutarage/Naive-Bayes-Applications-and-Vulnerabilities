@@ -6,11 +6,11 @@ output:
   html_document:
     df_print: paged
 ---
-The purpose of this code snippet to demonstrate the reader how a Naive Bayes (NB) classifier is vulnerable to Bayesian poisoning attacks. Bayesian poisoning is a technique used by email spammers to compromise the effectiveness of Bayesian based spam filters by adding non-spamming (ham) like words at the end of a spam message. As a result, the spam filter considers the message to be legitimate - a Type II statistical error. We use the R language in this implementation.
+The purpose of this code snippet is to demonstrate to the reader how a Naive Bayes (NB) classiﬁer is vulnerable to Bayesian poisoning attacks. Bayesian poisoning is a technique used by email spammers to compromise the eﬀectiveness of Bayesian-based spam ﬁlters by adding non-spamming (ham) like words at the end of a spam message. As a result, the spam ﬁlter considers the message to be legitimate - a Type II statistical error. We use the R language in this implementation.
 
 **The dataset:** We utilise the dataset at https://www.kaggle.com/venky73/spam-mails-dataset for this purpose. 
 
-**Machine learning (ML) task:** Our ML task in this problem would be a classification. First we develop a Bayesin based spam filter using the above email repository (raw emails) and then perform a Bayesian poisoning attack to bypass the security control. To this end, we poison the test data into the spam filter and bypass the security check.
+**Machine learning (ML) task:** Our ML task in this problem would be a classiﬁcation. First, we develop a Bayesian-based spam ﬁlter using the above email repository (raw emails) and then perform a Bayesian poisoning attack to bypass the security control. To this end, we poison the test data into the spam ﬁlter and bypass the security check.
 
 ```{r}
 set.seed(12345) # Set the seed value so that the same result is achieved in each replication
@@ -49,7 +49,7 @@ hamMsg<-subset(myData,label=="ham")
 
 As we can see in the above output, term distributions are different, so we can train a ML model (NB in our case) to classify our messages.
 
-**Building a NB based spam classifier:** Now we will train our NB classifier using the above dataset. We will utilize e1071 package in R for this purpose. To this end we need to follow following steps,
+**Building an NB based spam classifier:** Now we will train our NB classiﬁer using the above dataset. We will utilize e1071 package in R for this purpose. To this end, we need to follow following steps,
 
 step 1. We need to create a document term matrix (DTM) - a matrix that describes the frequency of terms occured in our message collection.
 
@@ -64,14 +64,14 @@ myDTM <- DocumentTermMatrix(myCorpus, control = list(
 ))
 ```
 
-Lets use only terms which are frequency >=5 as features in our model building.
+Let’s use only terms which have frequency >=5 as features in our model building.
 
 ```{r}
 freqWords <- findFreqTerms(myDTM,5)
 myDTM <- myDTM[,freqWords]
 ```
 
-step 2. Split the dataset into train and test sets. Later we going to poison the test set! We're going to do an 80/20 partitioning for the training and testing. We'll use the createDataPartition function from the caret package for this purpose.
+step 2. Split the dataset into train and test sets. Later we are going to poison the test set! We’re going to use an 80/20 partitioning for the training and testing. We’ll use the createDataPartition function from the caret package for this purpose.
 
 ```{r}
 tr_index <- createDataPartition(myData$label, p=0.80, list=FALSE) # List of 80% of the rows
