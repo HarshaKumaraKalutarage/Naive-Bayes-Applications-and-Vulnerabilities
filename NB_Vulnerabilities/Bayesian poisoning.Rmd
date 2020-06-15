@@ -1,8 +1,10 @@
 ---
 title: "Bayesian poisoning"
 output:
-  html_notebook: default
   pdf_document: default
+  html_notebook: default
+  html_document:
+    df_print: paged
 ---
 The purpose of this code snippet to demonstrate the reader how a Naive Bayes (NB) classifier is vulnerable to Bayesian poisoning attacks. Bayesian poisoning is a technique used by email spammers to compromise the effectiveness of Bayesian based spam filters by adding non-spamming (ham) like words at the end of a spam message. As a result, the spam filter considers the message to be legitimate - a Type II statistical error. We use the R language in this implementation.
 
@@ -41,8 +43,8 @@ Check the distributions of words (a.k.a document terms) in each class. If the te
 ```{r}
 spamMsg<-subset(myData,label=="spam")
 hamMsg<-subset(myData,label=="ham")
-wordcloud(spamMsg$text,scale=c(4,.5),min.freq=5) # plot if the word apperas more than 5 times in the spam messages
-wordcloud(hamMsg$text,scale=c(4,.5),min.freq=5) # plot if the word apperas more than 5 times in the ham messages
+# wordcloud(spamMsg$text,scale=c(4,.5),min.freq=5) # plot if the word apperas more than 5 times in the spam messages
+# wordcloud(hamMsg$text,scale=c(4,.5),min.freq=5) # plot if the word apperas more than 5 times in the ham messages
 ```
 
 As we can see in the above output, term distributions are different, so we can train a ML model (NB in our case) to classify our messages.
@@ -98,9 +100,7 @@ myDTMTestNew <- apply(myDTMTest, MARGIN = 2, convert_counts)
 
 ```{r}
 msgClassifier <- naiveBayes(myDTMTrainNew, trainSet$label)
-classifier[2]$tables$call
 testPredict <- predict(msgClassifier, myDTMTestNew)
-#CrossTable(testPredict, testLabels,           prop.chisq = FALSE, prop.t = FALSE,           dnn = c('predicted', 'actual'))
 ```
 
 ```{r}
