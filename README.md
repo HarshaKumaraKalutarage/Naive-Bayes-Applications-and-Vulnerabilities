@@ -1,4 +1,4 @@
-**Naive Bayes: Applications, Variations and Vulnerabilities - A Review of Literature with sample code snippets for implementations**
+**Naive Bayes: Applications, Variations and Vulnerabilities - A Review of Literature with implementation code snippets**
 
 By Indika Wickramasinghe and Harsha Kalutarage
 
@@ -6,4 +6,4 @@ The purpose of code snippets provided in this repository is to demonstrate to th
 
 **Citation requests**
 If you found this post and/or the R code snippet provided to be useful, please be kind enough to cite below article in your work:
-Wickramasinghe, I., & Kalutarage, H. (2020). Naive Bayes: Applications, Variations and Vulnerabilities - A Review of Literature with implementation code snippets. Soft Computing (accepted).
+Wickramasinghe, I., & Kalutarage, H. (2020). Naive Bayes: Applications, Variations and Vulnerabilities - A Review of Literature with implementation code snippets. Soft Computing (accepted with revisions).
