@@ -1648,61 +1648,54 @@ summary {
 #install.packages('gmodels')
 #install.packages('SnowballC')
 
-library(tm) # Load the necessary libraries</code></pre>
-<pre><code>## Loading required package: NLP</code></pre>
-<pre class="r"><code>library(wordcloud)</code></pre>
-<pre><code>## Loading required package: RColorBrewer</code></pre>
-<pre class="r"><code>library(e1071)
+library(tm) # Load the necessary libraries
+library(wordcloud)
+library(e1071)
 library(gmodels)
 library(SnowballC)
 library(caret)</code></pre>
-<pre><code>## Loading required package: lattice</code></pre>
-<pre><code>## Loading required package: ggplot2</code></pre>
-<pre><code>## 
-## Attaching package: 'ggplot2'</code></pre>
-<pre><code>## The following object is masked from 'package:NLP':
-## 
-##     annotate</code></pre>
 <p>Load the dataset to the R environment, and remove the term “Subject:” as it’s common in each message. There is no point of keeping common constant terms like “Subject:” as they don’t have discrimination power.</p>
 <pre class="r"><code>myData &lt;- read.csv(&quot;spam_ham_dataset.csv&quot;) # read the dataset
 myData&lt;-myData[,c(&quot;label&quot;,&quot;text&quot;)] # select two columns
 myData$text&lt;-substring(myData$text,9) # removing &quot;Subject:&quot;</code></pre>
-<p>Check the distributions of words (a.k.a document terms) in each class. If the term distributions are different, we can use term frequencies in a message as features to classify the message using an ML model.</p>
+<p>Let’s check the word distributions (a.k.a. document terms) in each class. To this end we use word clouds, in which the size of the word is proportional to its frequency in the text. If the word clouds are different, we can conclude that words that appear frequently in spams differ from words that appear in hams. Therefore, we can use words (features) in a text message to classify them as ham or spam.</p>
 <pre class="r"><code>spamMsg&lt;-subset(myData,label==&quot;spam&quot;)
 hamMsg&lt;-subset(myData,label==&quot;ham&quot;)
-# wordcloud(spamMsg$text,scale=c(4,.5),min.freq=5) # plot if the word apperas more than 5 times in the spam messages
-# wordcloud(hamMsg$text,scale=c(4,.5),min.freq=5) # plot if the word apperas more than 5 times in the ham messages</code></pre>
-<p>As we can see in the above output, term distributions are different, so we can train a ML model (NB in our case) to classify our messages.</p>
+# wordcloud(spamMsg$text,scale=c(4,.5),min.freq=5) # plot if the word apperas more than 5 times in the spam messages, makesure to uncomment this line to produce world cloud
+# wordcloud(hamMsg$text,scale=c(4,.5),min.freq=5) # plot if the word apperas more than 5 times in the ham messages,  makesure to uncomment this line to produce world cloud</code></pre>
+<p>As we can see in the word cloud outputs, the term distributions differ between spam and ham, so we can train an ML model (in our case, NB) by using words as features.</p>
 <p><strong>Building an NB based spam classifier:</strong> Now we will train our NB classiﬁer using the above dataset. We will utilize e1071 package in R for this purpose. To this end, we need to follow following steps,</p>
-<p>step 1. We need to create a document term matrix (DTM) - a matrix that describes the frequency of terms occured in our message collection.</p>
-<pre class="r"><code>myCorpus &lt;- VCorpus(VectorSource(myData$text))
+<p><strong>Step 1:</strong> We need to create a document term matrix (DTM) - a matrix that describes the frequency of terms occured in each message in our collection.</p>
+<pre class="r"><code>myCorpus &lt;- VCorpus(VectorSource(myData$text)) # create a corpus
 
 myDTM &lt;- DocumentTermMatrix(myCorpus, control = list(
   tolower=T,
   removeNumbers=T,
   removePunctuation=T,
-  stopwords = TRUE,
+  stopwords = T,
   stem=T
 ))</code></pre>
-<p>Let’s use only terms which have frequency &gt;=5 as features in our model building.</p>
+<p>DTM is usually a sparse matrix as most of its entries are filled with zeros. Let’s use only terms which have frequency &gt;=5 as features in our model building. To this end we use the findFreqTerms () function in R as follows. So, we can reduce the number of columns in our DTM matrix to 8615, which would be a manageable size in our model building.</p>
 <pre class="r"><code>freqWords &lt;- findFreqTerms(myDTM,5)
 myDTM &lt;- myDTM[,freqWords]</code></pre>
-<p>step 2. Split the dataset into train and test sets. Later we are going to poison the test set! We’re going to use an 80/20 partitioning for the training and testing. We’ll use the createDataPartition function from the caret package for this purpose.</p>
+<p><strong>Step 2:</strong> Split the dataset into train and test sets. Later we are going to poison the test set! We’re going to use an 80/20 partitioning for the training and testing. We’ll use the createDataPartition function from the caret package for this purpose.</p>
 <pre class="r"><code>tr_index &lt;- createDataPartition(myData$label, p=0.80, list=FALSE) # List of 80% of the rows
 trainSet &lt;- myData[tr_index,] # select 80% of the data for the trainSet
 testSet &lt;- myData[-tr_index,] # Select the remaining 20% of data for testSet</code></pre>
 <p>Since we are creating our NB model with the DTM entries, we should obtain corresponding DTM entries for the data in trainSet and testSet.</p>
 <pre class="r"><code>myDTMTrain &lt;- myDTM[tr_index,]
 myDTMTest &lt;- myDTM[-tr_index,]</code></pre>
+<p>Since we want to represent the presence or absence of a certain word (feature) in a particular message, we code our DTM as follows.</p>
 <pre class="r"><code>convert_counts &lt;- function(x) {
-  x &lt;- ifelse(x &gt; 0, &quot;Y&quot;, &quot;N&quot;)
+  x &lt;- ifelse(x &gt; 0, &quot;T&quot;, &quot;F&quot;)
 }
-
 myDTMTrainNew &lt;- apply(myDTMTrain, MARGIN = 2,convert_counts)
 myDTMTestNew &lt;- apply(myDTMTest, MARGIN = 2, convert_counts)</code></pre>
-<pre class="r"><code>msgClassifier &lt;- naiveBayes(myDTMTrainNew, trainSet$label)
-testPredict &lt;- predict(msgClassifier, myDTMTestNew)</code></pre>
-<pre class="r"><code>confusionMatrix(testPredict, testSet$label, positive = &quot;spam&quot;) # Print confusion matrix </code></pre>
+<p><strong>Step 3:</strong> Building the NB based spam filter.</p>
+<pre class="r"><code>NBbasedSpamFilter &lt;- naiveBayes(myDTMTrainNew, trainSet$label) # train the model
+testPredictMsgLabel &lt;- predict(NBbasedSpamFilter, myDTMTestNew) # predict labels for test cases</code></pre>
+<p>Create the confusion matrix, a table that is often used to describe the performance of a classifier.</p>
+<pre class="r"><code>confusionMatrix(testPredictMsgLabel, testSet$label, positive = &quot;spam&quot;) # Print confusion matrix</code></pre>
 <pre><code>## Confusion Matrix and Statistics
 ## 
 ##           Reference
@@ -1732,61 +1725,61 @@ testPredict &lt;- predict(msgClassifier, myDTMTestNew)</code></pre>
 ## </code></pre>
 <p><strong>Bayesian poisoning:</strong> Let’s poison the test data to bypass the above spam filter. To this end, randomly selected non-spam messages are ammended at the end of spam messages in our test dataset.</p>
 <pre class="r"><code>### Poison the test data
-spamTestCases &lt;- subset(testSet,label==&quot;spam&quot;)
-hamTestCases &lt;- subset(testSet, label==&quot;ham&quot;)
-hamMsgInmyData&lt;-subset(myData, label==&quot;ham&quot;)
-hamMsg2ammend&lt;-hamMsgInmyData[sample(nrow(hamMsgInmyData), nrow(hamTestCases)), ]
-hamTestCases$text &lt;-paste(hamTestCases$text,hamMsg2ammend$text,sep = &quot; &quot;)
-poisTestData&lt;-rbind(hamTestCases,spamTestCases)
-myData[-tr_index,]&lt;-poisTestData</code></pre>
-<p>Create the new DTM with poison data and remove low frequency words</p>
+spamTestCases &lt;- subset(testSet,label==&quot;spam&quot;) # select spams in test cases
+hamTestCases &lt;- subset(testSet, label==&quot;ham&quot;) # select ham in test cases
+hamMsgInmyData&lt;-subset(myData, label==&quot;ham&quot;) # select ham in our original dataset
+hamMsg2ammend&lt;-hamMsgInmyData[sample(nrow(hamMsgInmyData), nrow(spamTestCases)), ] # select number of ham messages equal to the spam messages in test cases
+spamTestCases$text &lt;-paste(spamTestCases$text,hamMsg2ammend$text,sep = &quot; &quot;) # ammend selected ham at the end of spams in test cases
+poisTestData&lt;-rbind(hamTestCases,spamTestCases) # create the poisoned test set
+myData[-tr_index,]&lt;-poisTestData # replace the test entries in original dataset with poisoned test cases</code></pre>
+<p>Create the new DTM with poisoned data and select high frequency words. Note that we have to create the DTM and split it as we did with original data in the above.</p>
 <pre class="r"><code>myCorpusPoisoned &lt;- VCorpus(VectorSource(myData$text))
 
-myDTMPoisoned &lt;- DocumentTermMatrix(myCorpus, control = list(
+myDTMPoisoned &lt;- DocumentTermMatrix(myCorpusPoisoned, control = list(
   tolower=T,
   removeNumbers=T,
   removePunctuation=T,
-  stopwords = TRUE,
+  stopwords = T,
   stem=T
 ))
 
 freqWords &lt;- findFreqTerms(myDTMPoisoned,5)
 myDTMPoisoned &lt;- myDTMPoisoned[,freqWords]
 
-myDTMTestPoisoned &lt;- myDTMPoisoned[-tr_index,] # new test set, do not need train set as we use the same model
+myDTMTestPoisoned &lt;- myDTMPoisoned[-tr_index,] # new test set, note that we don't need  a training set as we use the same model created above
 
-
-myDTMTestNewPoisoned &lt;- apply(myDTMTestPoisoned, MARGIN = 2, convert_counts) # convert to categorical</code></pre>
-<pre class="r"><code>testPredictPoisoned &lt;- predict(msgClassifier, myDTMTestNewPoisoned)</code></pre>
-<pre class="r"><code>confusionMatrix(testPredictPoisoned, testSet$label, positive = &quot;spam&quot;) # Print confusion matrix for poisoned data</code></pre>
+myDTMTestNewPoisoned &lt;- apply(myDTMTestPoisoned, MARGIN = 2, convert_counts) # Using the same convert_counts function, we code our poisoned test DTM as did in Step 2 above.</code></pre>
+<p>Predict labels for poisoned test cases, note that we use the same NBbasedSpamFilter trained above.</p>
+<pre class="r"><code>poisonedTestPredictMsgLabel &lt;- predict(NBbasedSpamFilter, myDTMTestNewPoisoned)</code></pre>
+<pre class="r"><code>confusionMatrix(poisonedTestPredictMsgLabel, testSet$label, positive = &quot;spam&quot;) # Print confusion matrix for poisoned data</code></pre>
 <pre><code>## Confusion Matrix and Statistics
 ## 
 ##           Reference
 ## Prediction ham spam
-##       ham  704   67
-##       spam  30  232
-##                                           
-##                Accuracy : 0.9061          
-##                  95% CI : (0.8867, 0.9232)
-##     No Information Rate : 0.7106          
-##     P-Value [Acc &gt; NIR] : &lt; 2.2e-16       
-##                                           
-##                   Kappa : 0.763           
-##                                           
-##  Mcnemar's Test P-Value : 0.0002569       
-##                                           
-##             Sensitivity : 0.7759          
-##             Specificity : 0.9591          
-##          Pos Pred Value : 0.8855          
-##          Neg Pred Value : 0.9131          
-##              Prevalence : 0.2894          
-##          Detection Rate : 0.2246          
-##    Detection Prevalence : 0.2536          
-##       Balanced Accuracy : 0.8675          
-##                                           
-##        'Positive' Class : spam            
+##       ham  641  256
+##       spam  93   43
+##                                          
+##                Accuracy : 0.6621         
+##                  95% CI : (0.6324, 0.691)
+##     No Information Rate : 0.7106         
+##     P-Value [Acc &gt; NIR] : 0.9997         
+##                                          
+##                   Kappa : 0.0204         
+##                                          
+##  Mcnemar's Test P-Value : &lt;2e-16         
+##                                          
+##             Sensitivity : 0.14381        
+##             Specificity : 0.87330        
+##          Pos Pred Value : 0.31618        
+##          Neg Pred Value : 0.71460        
+##              Prevalence : 0.28945        
+##          Detection Rate : 0.04163        
+##    Detection Prevalence : 0.13166        
+##       Balanced Accuracy : 0.50855        
+##                                          
+##        'Positive' Class : spam           
 ## </code></pre>
-<p>As you can see, the misclassification of spam as ham (false negative) increases from 67 to 220.</p>
+<p>As you can see in the confusion matrix, the misclassification of spam as ham (false negative) increases from 67 to 256. By adding more ham-like words to the end of spam messages, the attacker can further increase the false negative number.</p>
 
 
 

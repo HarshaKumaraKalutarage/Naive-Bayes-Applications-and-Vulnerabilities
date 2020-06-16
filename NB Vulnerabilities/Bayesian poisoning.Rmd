@@ -1,9 +1,9 @@
 ---
 title: "Bayesian poisoning"
 output:
+  pdf_document: default
   html_document:
     df_print: paged
-  pdf_document: default
   html_notebook: default
 ---
 The purpose of this code snippet is to demonstrate to the reader how a Naive Bayes (NB) classiﬁer is vulnerable to Bayesian poisoning attacks. Bayesian poisoning is a technique used by email spammers to compromise the eﬀectiveness of Bayesian-based spam ﬁlters by adding non-spamming (ham) like words at the end of a spam message. As a result, the spam ﬁlter considers the message to be legitimate - a Type II statistical error. We use the R language in this implementation.
@@ -43,8 +43,8 @@ Let's check the word distributions (a.k.a. document terms) in each class. To thi
 ```{r message=FALSE}
 spamMsg<-subset(myData,label=="spam")
 hamMsg<-subset(myData,label=="ham")
-# wordcloud(spamMsg$text,scale=c(4,.5),min.freq=5) # plot if the word apperas more than 5 times in the spam messages, makesure to uncomment this line to produce world cloud
-# wordcloud(hamMsg$text,scale=c(4,.5),min.freq=5) # plot if the word apperas more than 5 times in the ham messages,  makesure to uncomment this line to produce world cloud
+# wordcloud(spamMsg$text,scale=c(4,.5),min.freq=5) # plot if the word apperas more than 5 times in the spam messages, makesure to uncomment this line to produce word cloud
+# wordcloud(hamMsg$text,scale=c(4,.5),min.freq=5) # plot if the word apperas more than 5 times in the ham messages,  makesure to uncomment this line to produce word cloud
 ```
 
 As we can see in the word cloud outputs, the term distributions differ between spam and ham, so we can train an ML model (in our case, NB) by using words as features. 
