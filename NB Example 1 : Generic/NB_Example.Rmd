@@ -1,10 +1,10 @@
 ---
 title: "Naive Bayes - An example using R language"
 output:
-  pdf_document: default
-  html_notebook: default
   html_document:
     df_print: paged
+  html_notebook: default
+  pdf_document: default
 ---
 The purpose of this code snippet is to demonstrate to the reader how a Naive Bayes (NB) classiﬁer can be trained on a given dataset using the R language.
 

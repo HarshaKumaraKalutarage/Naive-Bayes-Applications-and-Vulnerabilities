@@ -1637,8 +1637,8 @@ summary {
 </div>
 
 
-<p>The purpose of this code snippet is to demonstrate to the reader how a Naive Bayes (NB) classifier can be trained on given dataset using the R language. Note that building and deploying NB-enabled systems in industry settings would be more complicated than this simplified example (toy example) and such a discussion is out of the scope of this work.</p>
-<p><strong>The dataset:</strong> We use the well-known Iris dataset (included with R) for this purpose. It contains four features (measurements) for 150 flowers representing three types of iris plants: Setosa, Versicolor and Virginica.</p>
+<p>The purpose of this code snippet is to demonstrate to the reader how a Naive Bayes (NB) classiﬁer can be trained on a given dataset using the R language.</p>
+<p><strong>The dataset:</strong> In order to implement the above code, we use the well-known Iris dataset(included with R) for this purpose. It consists of four features (measurements), namely sepal length, sepal width, petal length, and petal width for 150 ﬂowers. The dataset contains information about three types of iris plants: Setosa, Versicolor and Virginica.</p>
 <p><strong>Machine learning (ML) task:</strong> We will train a NB model to identify the plant type based on the four measurements of a given flower. So, our ML task in this problem would be a classification.</p>
 <pre class="r"><code>data(iris) # Attach the Iris dataset to the R environment
 mydata &lt;- iris # Let's rename the dataset as mydata
@@ -1670,7 +1670,7 @@ dim(mydata) # check dimensions of mydata</code></pre>
 ##                 
 ##                 
 ## </code></pre>
-<p><strong>Creating training and validation datasets:</strong> We’re going to do an 80/20 partitioning for the training and validation sets. We use the createDataPartition function from the caret package for this purpose.</p>
+<p><strong>Creating training and validation datasets:</strong> We’re going to construct a 80/20 partitioning for the training and validation sets. We use the createDataPartition function from the caret package for this purpose.</p>
 <pre class="r"><code>#install.packages(&quot;caret&quot;) #If the caret package is not installed on your system, uncomment this line to install it first
 library(caret) #Loading the library</code></pre>
 <pre><code>## Loading required package: lattice</code></pre>
@@ -1678,7 +1678,7 @@ library(caret) #Loading the library</code></pre>
 <pre class="r"><code>tr_index &lt;- createDataPartition(mydata$Species, p=0.80, list=FALSE) # List of 80% of the rows
 trainSet &lt;- mydata[tr_index,] # select 80% of the data for the trainSet
 testSet &lt;- mydata[-tr_index,] # Select the remaining 20% of data for testSet</code></pre>
-<p><strong>Building a NB classifier:</strong> Now we will train our NB classifier usinf the above trainSet. We will utilize e1071 package in R for this purpose. Note the priori probabilities when outputting the following lines of code. We get the same priori probabilities for all classes.</p>
+<p><strong>Building a NB classifier:</strong> Now we will train our NB classiﬁer using the above trainSet. For this purpose, we will utilize e1071 package in R. Note the priori probabilities when outputting the following lines of code. We get the same priori probabilities for all classes.</p>
 <pre class="r"><code>#install.packages(&quot;e1071&quot;) #If the e1071 package is not installed on your system, uncomment this line to install it first
 library(e1071)
 NBclassfier=naiveBayes(Species~., data=trainSet) # Once you call this line, R fits the NB model using trainSet
@@ -1697,27 +1697,27 @@ print(NBclassfier) # Check the newly fitted model to see if everything is OK.</c
 ## Conditional probabilities:
 ##             Sepal.Length
 ## Y              [,1]      [,2]
-##   setosa     4.9925 0.3392204
-##   versicolor 5.9375 0.5461696
-##   virginica  6.5725 0.6613845
+##   setosa     5.0525 0.3601905
+##   versicolor 5.9275 0.5425427
+##   virginica  6.5850 0.6399319
 ## 
 ##             Sepal.Width
 ## Y              [,1]      [,2]
-##   setosa     3.4075 0.3377053
-##   versicolor 2.7500 0.3250247
-##   virginica  3.0300 0.2839285
+##   setosa     3.4600 0.3571971
+##   versicolor 2.7575 0.3388423
+##   virginica  2.9875 0.3420807
 ## 
 ##             Petal.Length
-## Y             [,1]      [,2]
-##   setosa     1.470 0.1870143
-##   versicolor 4.240 0.4855871
-##   virginica  5.525 0.5541221
+## Y              [,1]      [,2]
+##   setosa     1.4825 0.1795828
+##   versicolor 4.2350 0.4774666
+##   virginica  5.5350 0.5641195
 ## 
 ##             Petal.Width
 ## Y              [,1]      [,2]
-##   setosa     0.2550 0.1108244
-##   versicolor 1.3225 0.2081512
-##   virginica  2.0600 0.2447395</code></pre>
+##   setosa     0.2525 0.1061868
+##   versicolor 1.3225 0.2006240
+##   virginica  2.0550 0.2678978</code></pre>
 <p><strong>Make predictions:</strong> Now let’s apply the above model to assign labels for test cases in testSet. Then we create the confusion matrix, a table that is often used to describe the performance of a classifier.</p>
 <pre class="r"><code>  testPrediction=predict(NBclassfier, newdata=testSet, type=&quot;class&quot;) # Assign labels for each test case
   confusionMatrix(testPrediction, testSet$Species) # Print confusion matrix </code></pre>
@@ -1726,8 +1726,8 @@ print(NBclassfier) # Check the newly fitted model to see if everything is OK.</c
 ##             Reference
 ## Prediction   setosa versicolor virginica
 ##   setosa         10          0         0
-##   versicolor      0         10         2
-##   virginica       0          0         8
+##   versicolor      0          9         1
+##   virginica       0          1         9
 ## 
 ## Overall Statistics
 ##                                           
@@ -1743,14 +1743,14 @@ print(NBclassfier) # Check the newly fitted model to see if everything is OK.</c
 ## Statistics by Class:
 ## 
 ##                      Class: setosa Class: versicolor Class: virginica
-## Sensitivity                 1.0000            1.0000           0.8000
-## Specificity                 1.0000            0.9000           1.0000
-## Pos Pred Value              1.0000            0.8333           1.0000
-## Neg Pred Value              1.0000            1.0000           0.9091
+## Sensitivity                 1.0000            0.9000           0.9000
+## Specificity                 1.0000            0.9500           0.9500
+## Pos Pred Value              1.0000            0.9000           0.9000
+## Neg Pred Value              1.0000            0.9500           0.9500
 ## Prevalence                  0.3333            0.3333           0.3333
-## Detection Rate              0.3333            0.3333           0.2667
-## Detection Prevalence        0.3333            0.4000           0.2667
-## Balanced Accuracy           1.0000            0.9500           0.9000</code></pre>
+## Detection Rate              0.3333            0.3000           0.3000
+## Detection Prevalence        0.3333            0.3333           0.3333
+## Balanced Accuracy           1.0000            0.9250           0.9250</code></pre>
 <p>We can see that the accuracy is 91.3%. It was a small test set, but whether or not that accuracy is sufficient depends on the problem context and is based on many other factors such as the cost of misclassification to the business.</p>
 
 
