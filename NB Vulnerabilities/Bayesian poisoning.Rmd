@@ -2,9 +2,9 @@
 title: "Bayesian poisoning"
 output:
   pdf_document: default
-  html_notebook: default
   html_document:
     df_print: paged
+  html_notebook: default
 ---
 The purpose of this code snippet is to demonstrate to the reader how a Naive Bayes (NB) classiﬁer is vulnerable to Bayesian poisoning attacks. Bayesian poisoning is a technique used by email spammers to compromise the eﬀectiveness of Bayesian-based spam ﬁlters by adding non-spamming (ham) like words at the end of a spam message. As a result, the spam ﬁlter considers the message to be legitimate - a Type II statistical error. We use the R language in this implementation.
 
@@ -60,8 +60,10 @@ myDTM <- DocumentTermMatrix(myCorpus, control = list(
   tolower=T,
   removeNumbers=T,
   removePunctuation=T,
+  stopwords = TRUE,
   stem=T
 ))
+
 ```
 
 Let’s use only terms which have frequency >=5 as features in our model building.
@@ -89,7 +91,7 @@ myDTMTest <- myDTM[-tr_index,]
 
 ```{r}
 convert_counts <- function(x) {
-  x <- ifelse(x > 0, 1, 0)
+  x <- ifelse(x > 0, "Y", "N")
 }
 
 myDTMTrainNew <- apply(myDTMTrain, MARGIN = 2,convert_counts)
@@ -104,6 +106,50 @@ testPredict <- predict(msgClassifier, myDTMTestNew)
 ```
 
 ```{r}
-confusionMatrix(testPredict, testSet$label) # Print confusion matrix 
+confusionMatrix(testPredict, testSet$label, positive = "spam") # Print confusion matrix 
 ```
 
+**Bayesian poisoning:** Let's poison the test data to bypass the above spam filter. To this end, randomly selected non-spam messages are ammended at the end of spam messages in our test dataset.
+```{r}
+### Poison the test data
+spamTestCases <- subset(testSet,label=="spam")
+hamTestCases <- subset(testSet, label=="ham")
+hamMsgInmyData<-subset(myData, label=="ham")
+hamMsg2ammend<-hamMsgInmyData[sample(nrow(hamMsgInmyData), nrow(hamTestCases)), ]
+hamTestCases$text <-paste(hamTestCases$text,hamMsg2ammend$text,sep = " ")
+poisTestData<-rbind(hamTestCases,spamTestCases)
+myData[-tr_index,]<-poisTestData
+```
+
+Create the new DTM with poison data and remove low frequency words
+```{r}
+myCorpusPoisoned <- VCorpus(VectorSource(myData$text))
+
+myDTMPoisoned <- DocumentTermMatrix(myCorpus, control = list(
+  tolower=T,
+  removeNumbers=T,
+  removePunctuation=T,
+  stopwords = T,
+  stem=T
+))
+
+freqWords <- findFreqTerms(myDTMPoisoned,5)
+myDTMPoisoned <- myDTMPoisoned[,freqWords]
+
+myDTMTestPoisoned <- myDTMPoisoned[-tr_index,] # new test set, do not need train set as we use the same model
+
+
+myDTMTestNewPoisoned <- apply(myDTMTestPoisoned, MARGIN = 2, convert_counts) # convert to categorical
+
+```
+
+
+```{r}
+testPredictPoisoned <- predict(msgClassifier, myDTMTestNewPoisoned)
+```
+
+```{r}
+confusionMatrix(testPredictPoisoned, testSet$label, positive = "spam") # Print confusion matrix for poisoned data
+
+```
+As you can see in the confusion matrix, the misclassification of spam as ham (false negative) increases from 67 to 220. Adding more hap like words at the end of spam messages attacker can increase the false negative number further.

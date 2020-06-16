@@ -1799,15 +1799,17 @@ hamMsg&lt;-subset(myData,label==&quot;ham&quot;)
 <p>step 1. We need to create a document term matrix (DTM) - a matrix that describes the frequency of terms occured in our message collection.</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubXlDb3JwdXMgPC0gVkNvcnB1cyhWZWN0b3JTb3VyY2UobXlEYXRhJHRleHQpKVxuXG5teURUTSA8LSBEb2N1bWVudFRlcm1NYXRyaXgobXlDb3JwdXMsIGNvbnRyb2wgPSBsaXN0KFxuICB0b2xvd2VyPVQsXG4gIHJlbW92ZU51bWJlcnM9VCxcbiAgcmVtb3ZlUHVuY3R1YXRpb249VCxcbiAgc3RlbT1UXG4pKVxuYGBgIn0= -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubXlDb3JwdXMgPC0gVkNvcnB1cyhWZWN0b3JTb3VyY2UobXlEYXRhJHRleHQpKVxuXG5teURUTSA8LSBEb2N1bWVudFRlcm1NYXRyaXgobXlDb3JwdXMsIGNvbnRyb2wgPSBsaXN0KFxuICB0b2xvd2VyPVQsXG4gIHJlbW92ZU51bWJlcnM9VCxcbiAgcmVtb3ZlUHVuY3R1YXRpb249VCxcbiAgc3RvcHdvcmRzID0gVFJVRSxcbiAgc3RlbT1UXG4pKVxuXG5gYGAifQ== -->
 <pre class="r"><code>myCorpus &lt;- VCorpus(VectorSource(myData$text))
 
 myDTM &lt;- DocumentTermMatrix(myCorpus, control = list(
   tolower=T,
   removeNumbers=T,
   removePunctuation=T,
+  stopwords = TRUE,
   stem=T
-))</code></pre>
+))
+</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
@@ -1841,9 +1843,13 @@ myDTMTest &lt;- myDTM[-tr_index,]</code></pre>
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuY29udmVydF9jb3VudHMgPC0gZnVuY3Rpb24oeCkge1xuICB4IDwtIGlmZWxzZSh4ID4gMCwgMSwgMClcbn1cblxubXlEVE1UcmFpbk5ldyA8LSBhcHBseShteURUTVRyYWluLCBNQVJHSU4gPSAyLGNvbnZlcnRfY291bnRzKVxubXlEVE1UZXN0TmV3IDwtIGFwcGx5KG15RFRNVGVzdCwgTUFSR0lOID0gMiwgY29udmVydF9jb3VudHMpXG5gYGAifQ== -->
-<pre class="r"><code>convert_counts &lt;- function(x) {
-  x &lt;- ifelse(x &gt; 0, 1, 0)
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyBjb252ZXJ0X2NvdW50cyA8LSBmdW5jdGlvbih4KSB7XG4jICAgeCA8LSBpZmVsc2UoeCA+IDAsIDEsIDApXG4jIH1cblxuY29udmVydF9jb3VudHMgPC0gZnVuY3Rpb24oeCkge1xuICB4IDwtIGlmZWxzZSh4ID4gMCwgXCJZXCIsIFwiTlwiKVxufVxuXG5teURUTVRyYWluTmV3IDwtIGFwcGx5KG15RFRNVHJhaW4sIE1BUkdJTiA9IDIsY29udmVydF9jb3VudHMpXG5teURUTVRlc3ROZXcgPC0gYXBwbHkobXlEVE1UZXN0LCBNQVJHSU4gPSAyLCBjb252ZXJ0X2NvdW50cylcbmBgYCJ9 -->
+<pre class="r"><code># convert_counts &lt;- function(x) {
+#   x &lt;- ifelse(x &gt; 0, 1, 0)
+# }
+
+convert_counts &lt;- function(x) {
+  x &lt;- ifelse(x &gt; 0, &quot;Y&quot;, &quot;N&quot;)
 }
 
 myDTMTrainNew &lt;- apply(myDTMTrain, MARGIN = 2,convert_counts)
@@ -1861,14 +1867,129 @@ testPredict &lt;- predict(msgClassifier, myDTMTestNew)</code></pre>
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuY29uZnVzaW9uTWF0cml4KHRlc3RQcmVkaWN0LCB0ZXN0U2V0JGxhYmVsKSAjIFByaW50IGNvbmZ1c2lvbiBtYXRyaXggXG5gYGAifQ== -->
-<pre class="r"><code>confusionMatrix(testPredict, testSet$label) # Print confusion matrix </code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuY29uZnVzaW9uTWF0cml4KHRlc3RQcmVkaWN0LCB0ZXN0U2V0JGxhYmVsLCBwb3NpdGl2ZSA9IFwic3BhbVwiKSAjIFByaW50IGNvbmZ1c2lvbiBtYXRyaXggXG5gYGAifQ== -->
+<pre class="r"><code>confusionMatrix(testPredict, testSet$label, positive = &quot;spam&quot;) # Print confusion matrix </code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiQ29uZnVzaW9uIE1hdHJpeCBhbmQgU3RhdGlzdGljc1xuXG4gICAgICAgICAgUmVmZXJlbmNlXG5QcmVkaWN0aW9uIGhhbSBzcGFtXG4gICAgICBoYW0gIDcwNCAgIDY3XG4gICAgICBzcGFtICAzMCAgMjMyXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcbiAgICAgICAgICAgICAgIEFjY3VyYWN5IDogMC45MDYxICAgICAgICAgIFxuICAgICAgICAgICAgICAgICA5NSUgQ0kgOiAoMC44ODY3LCAwLjkyMzIpXG4gICAgTm8gSW5mb3JtYXRpb24gUmF0ZSA6IDAuNzEwNiAgICAgICAgICBcbiAgICBQLVZhbHVlIFtBY2MgPiBOSVJdIDogPCAyLjJlLTE2ICAgICAgIFxuICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXG4gICAgICAgICAgICAgICAgICBLYXBwYSA6IDAuNzYzICAgICAgICAgICBcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFxuIE1jbmVtYXIncyBUZXN0IFAtVmFsdWUgOiAwLjAwMDI1NjkgICAgICAgXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcbiAgICAgICAgICAgIFNlbnNpdGl2aXR5IDogMC43NzU5ICAgICAgICAgIFxuICAgICAgICAgICAgU3BlY2lmaWNpdHkgOiAwLjk1OTEgICAgICAgICAgXG4gICAgICAgICBQb3MgUHJlZCBWYWx1ZSA6IDAuODg1NSAgICAgICAgICBcbiAgICAgICAgIE5lZyBQcmVkIFZhbHVlIDogMC45MTMxICAgICAgICAgIFxuICAgICAgICAgICAgIFByZXZhbGVuY2UgOiAwLjI4OTQgICAgICAgICAgXG4gICAgICAgICBEZXRlY3Rpb24gUmF0ZSA6IDAuMjI0NiAgICAgICAgICBcbiAgIERldGVjdGlvbiBQcmV2YWxlbmNlIDogMC4yNTM2ICAgICAgICAgIFxuICAgICAgQmFsYW5jZWQgQWNjdXJhY3kgOiAwLjg2NzUgICAgICAgICAgXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcbiAgICAgICAnUG9zaXRpdmUnIENsYXNzIDogc3BhbSAgICAgICAgICAgIFxuICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXG4ifQ== -->
+<pre><code>Confusion Matrix and Statistics
+
+          Reference
+Prediction ham spam
+      ham  704   67
+      spam  30  232
+                                          
+               Accuracy : 0.9061          
+                 95% CI : (0.8867, 0.9232)
+    No Information Rate : 0.7106          
+    P-Value [Acc &gt; NIR] : &lt; 2.2e-16       
+                                          
+                  Kappa : 0.763           
+                                          
+ Mcnemar's Test P-Value : 0.0002569       
+                                          
+            Sensitivity : 0.7759          
+            Specificity : 0.9591          
+         Pos Pred Value : 0.8855          
+         Neg Pred Value : 0.9131          
+             Prevalence : 0.2894          
+         Detection Rate : 0.2246          
+   Detection Prevalence : 0.2536          
+      Balanced Accuracy : 0.8675          
+                                          
+       'Positive' Class : spam            
+                                          </code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p><strong>Bayesian poisoning:</strong> Let’s poison the test data to bypass the above spam filter. To this end, randomly selected non-spam messages are ammended at the end of spam messages in our test dataset.</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyMjIFBvaXNvbiB0aGUgdGVzdCBkYXRhXG4jcG9pc1Rlc3Q8LW15RGF0YVstdHJhaW5faW5kZXgsXVxuXG5zcGFtVGVzdENhc2VzIDwtIHN1YnNldCh0ZXN0U2V0LGxhYmVsPT1cInNwYW1cIilcbmhhbVRlc3RDYXNlcyA8LSBzdWJzZXQodGVzdFNldCwgbGFiZWw9PVwiaGFtXCIpXG5oYW1Nc2dJbm15RGF0YTwtc3Vic2V0KG15RGF0YSwgbGFiZWw9PVwiaGFtXCIpXG5oYW1Nc2cyYW1tZW5kPC1oYW1Nc2dJbm15RGF0YVtzYW1wbGUobnJvdyhoYW1Nc2dJbm15RGF0YSksIG5yb3coaGFtVGVzdENhc2VzKSksIF1cbmhhbVRlc3RDYXNlcyR0ZXh0IDwtcGFzdGUoaGFtVGVzdENhc2VzJHRleHQsaGFtTXNnMmFtbWVuZCR0ZXh0LHNlcCA9IFwiIFwiKVxucG9pc1Rlc3REYXRhPC1yYmluZChoYW1UZXN0Q2FzZXMsc3BhbVRlc3RDYXNlcylcbm15RGF0YVstdHJfaW5kZXgsXTwtcG9pc1Rlc3REYXRhXG5gYGAifQ== -->
+<pre class="r"><code>### Poison the test data
+#poisTest&lt;-myData[-train_index,]
+
+spamTestCases &lt;- subset(testSet,label==&quot;spam&quot;)
+hamTestCases &lt;- subset(testSet, label==&quot;ham&quot;)
+hamMsgInmyData&lt;-subset(myData, label==&quot;ham&quot;)
+hamMsg2ammend&lt;-hamMsgInmyData[sample(nrow(hamMsgInmyData), nrow(hamTestCases)), ]
+hamTestCases$text &lt;-paste(hamTestCases$text,hamMsg2ammend$text,sep = &quot; &quot;)
+poisTestData&lt;-rbind(hamTestCases,spamTestCases)
+myData[-tr_index,]&lt;-poisTestData</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>Create the new DTM with poison data and remove low frequency words</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubXlDb3JwdXNQb2lzb25lZCA8LSBWQ29ycHVzKFZlY3RvclNvdXJjZShteURhdGEkdGV4dCkpXG5cbm15RFRNUG9pc29uZWQgPC0gRG9jdW1lbnRUZXJtTWF0cml4KG15Q29ycHVzLCBjb250cm9sID0gbGlzdChcbiAgdG9sb3dlcj1ULFxuICByZW1vdmVOdW1iZXJzPVQsXG4gIHJlbW92ZVB1bmN0dWF0aW9uPVQsXG4gIHN0b3B3b3JkcyA9IFRSVUUsXG4gIHN0ZW09VFxuKSlcblxuZnJlcVdvcmRzIDwtIGZpbmRGcmVxVGVybXMobXlEVE1Qb2lzb25lZCw1KVxubXlEVE1Qb2lzb25lZCA8LSBteURUTVBvaXNvbmVkWyxmcmVxV29yZHNdXG5cbm15RFRNVGVzdFBvaXNvbmVkIDwtIG15RFRNUG9pc29uZWRbLXRyX2luZGV4LF0gIyBuZXcgdGVzdCBzZXQsIGRvIG5vdCBuZWVkIHRyYWluIHNldCBhcyB3ZSB1c2UgdGhlIHNhbWUgbW9kZWxcblxuXG5teURUTVRlc3ROZXdQb2lzb25lZCA8LSBhcHBseShteURUTVRlc3RQb2lzb25lZCwgTUFSR0lOID0gMiwgY29udmVydF9jb3VudHMpICMgY29udmVydCB0byBjYXRlZ29yaWNhbFxuXG5gYGAifQ== -->
+<pre class="r"><code>myCorpusPoisoned &lt;- VCorpus(VectorSource(myData$text))
+
+myDTMPoisoned &lt;- DocumentTermMatrix(myCorpus, control = list(
+  tolower=T,
+  removeNumbers=T,
+  removePunctuation=T,
+  stopwords = TRUE,
+  stem=T
+))
+
+freqWords &lt;- findFreqTerms(myDTMPoisoned,5)
+myDTMPoisoned &lt;- myDTMPoisoned[,freqWords]
+
+myDTMTestPoisoned &lt;- myDTMPoisoned[-tr_index,] # new test set, do not need train set as we use the same model
+
+
+myDTMTestNewPoisoned &lt;- apply(myDTMTestPoisoned, MARGIN = 2, convert_counts) # convert to categorical
+</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxudGVzdFByZWRpY3RQb2lzb25lZCA8LSBwcmVkaWN0KG1zZ0NsYXNzaWZpZXIsIG15RFRNVGVzdE5ld1BvaXNvbmVkKVxuYGBgIn0= -->
+<pre class="r"><code>testPredictPoisoned &lt;- predict(msgClassifier, myDTMTestNewPoisoned)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuY29uZnVzaW9uTWF0cml4KHRlc3RQcmVkaWN0UG9pc29uZWQsIHRlc3RTZXQkbGFiZWwsIHBvc2l0aXZlID0gXCJzcGFtXCIpICMgUHJpbnQgY29uZnVzaW9uIG1hdHJpeCBmb3IgcG9pc29uZWQgZGF0YVxuYGBgIn0= -->
+<pre class="r"><code>confusionMatrix(testPredictPoisoned, testSet$label, positive = &quot;spam&quot;) # Print confusion matrix for poisoned data</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiQ29uZnVzaW9uIE1hdHJpeCBhbmQgU3RhdGlzdGljc1xuXG4gICAgICAgICAgUmVmZXJlbmNlXG5QcmVkaWN0aW9uIGhhbSBzcGFtXG4gICAgICBoYW0gIDU1NiAgMjIwXG4gICAgICBzcGFtIDE3OCAgIDc5XG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcbiAgICAgICAgICAgICAgIEFjY3VyYWN5IDogMC42MTQ3ICAgICAgICAgIFxuICAgICAgICAgICAgICAgICA5NSUgQ0kgOiAoMC41ODQzLCAwLjY0NDUpXG4gICAgTm8gSW5mb3JtYXRpb24gUmF0ZSA6IDAuNzEwNiAgICAgICAgICBcbiAgICBQLVZhbHVlIFtBY2MgPiBOSVJdIDogMS4wMDAwMCAgICAgICAgIFxuICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXG4gICAgICAgICAgICAgICAgICBLYXBwYSA6IDAuMDIyNyAgICAgICAgICBcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFxuIE1jbmVtYXIncyBUZXN0IFAtVmFsdWUgOiAwLjAzOTg3ICAgICAgICAgXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcbiAgICAgICAgICAgIFNlbnNpdGl2aXR5IDogMC4yNjQyMSAgICAgICAgIFxuICAgICAgICAgICAgU3BlY2lmaWNpdHkgOiAwLjc1NzQ5ICAgICAgICAgXG4gICAgICAgICBQb3MgUHJlZCBWYWx1ZSA6IDAuMzA3MzkgICAgICAgICBcbiAgICAgICAgIE5lZyBQcmVkIFZhbHVlIDogMC43MTY0OSAgICAgICAgIFxuICAgICAgICAgICAgIFByZXZhbGVuY2UgOiAwLjI4OTQ1ICAgICAgICAgXG4gICAgICAgICBEZXRlY3Rpb24gUmF0ZSA6IDAuMDc2NDggICAgICAgICBcbiAgIERldGVjdGlvbiBQcmV2YWxlbmNlIDogMC4yNDg3OSAgICAgICAgIFxuICAgICAgQmFsYW5jZWQgQWNjdXJhY3kgOiAwLjUxMDg1ICAgICAgICAgXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcbiAgICAgICAnUG9zaXRpdmUnIENsYXNzIDogc3BhbSAgICAgICAgICAgIFxuICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXG4ifQ== -->
+<pre><code>Confusion Matrix and Statistics
 
-<div id="rmd-source-code">LS0tCnRpdGxlOiAiQmF5ZXNpYW4gcG9pc29uaW5nIgpvdXRwdXQ6CiAgcGRmX2RvY3VtZW50OiBkZWZhdWx0CiAgaHRtbF9ub3RlYm9vazogZGVmYXVsdAogIGh0bWxfZG9jdW1lbnQ6CiAgICBkZl9wcmludDogcGFnZWQKLS0tClRoZSBwdXJwb3NlIG9mIHRoaXMgY29kZSBzbmlwcGV0IGlzIHRvIGRlbW9uc3RyYXRlIHRvIHRoZSByZWFkZXIgaG93IGEgTmFpdmUgQmF5ZXMgKE5CKSBjbGFzc2nvrIFlciBpcyB2dWxuZXJhYmxlIHRvIEJheWVzaWFuIHBvaXNvbmluZyBhdHRhY2tzLiBCYXllc2lhbiBwb2lzb25pbmcgaXMgYSB0ZWNobmlxdWUgdXNlZCBieSBlbWFpbCBzcGFtbWVycyB0byBjb21wcm9taXNlIHRoZSBl76yAZWN0aXZlbmVzcyBvZiBCYXllc2lhbi1iYXNlZCBzcGFtIO+sgWx0ZXJzIGJ5IGFkZGluZyBub24tc3BhbW1pbmcgKGhhbSkgbGlrZSB3b3JkcyBhdCB0aGUgZW5kIG9mIGEgc3BhbSBtZXNzYWdlLiBBcyBhIHJlc3VsdCwgdGhlIHNwYW0g76yBbHRlciBjb25zaWRlcnMgdGhlIG1lc3NhZ2UgdG8gYmUgbGVnaXRpbWF0ZSAtIGEgVHlwZSBJSSBzdGF0aXN0aWNhbCBlcnJvci4gV2UgdXNlIHRoZSBSIGxhbmd1YWdlIGluIHRoaXMgaW1wbGVtZW50YXRpb24uCgoqKlRoZSBkYXRhc2V0OioqIFdlIHV0aWxpc2UgdGhlIGRhdGFzZXQgYXQgaHR0cHM6Ly93d3cua2FnZ2xlLmNvbS92ZW5reTczL3NwYW0tbWFpbHMtZGF0YXNldCBmb3IgdGhpcyBwdXJwb3NlLiAKCioqTWFjaGluZSBsZWFybmluZyAoTUwpIHRhc2s6KiogT3VyIE1MIHRhc2sgaW4gdGhpcyBwcm9ibGVtIHdvdWxkIGJlIGEgY2xhc3Np76yBY2F0aW9uLiBGaXJzdCwgd2UgZGV2ZWxvcCBhIEJheWVzaWFuLWJhc2VkIHNwYW0g76yBbHRlciB1c2luZyB0aGUgYWJvdmUgZW1haWwgcmVwb3NpdG9yeSAocmF3IGVtYWlscykgYW5kIHRoZW4gcGVyZm9ybSBhIEJheWVzaWFuIHBvaXNvbmluZyBhdHRhY2sgdG8gYnlwYXNzIHRoZSBzZWN1cml0eSBjb250cm9sLiBUbyB0aGlzIGVuZCwgd2UgcG9pc29uIHRoZSB0ZXN0IGRhdGEgaW50byB0aGUgc3BhbSDvrIFsdGVyIGFuZCBieXBhc3MgdGhlIHNlY3VyaXR5IGNoZWNrLgoKYGBge3J9CnNldC5zZWVkKDEyMzQ1KSAjIFNldCB0aGUgc2VlZCB2YWx1ZSBzbyB0aGF0IHRoZSBzYW1lIHJlc3VsdCBpcyBhY2hpZXZlZCBpbiBlYWNoIHJlcGxpY2F0aW9uCgojaW5zdGFsbC5wYWNrYWdlcygndG0nKSAjIEluc3RhbGwgdGhlIHJlcXVpcmVkIGxpYnJhcmllcyBpZiB5b3VyIHN5c3RlbSBkb2VzIG5vdCBoYXZlIHRoZW0KI2luc3RhbGwucGFja2FnZXMoJ3dvcmRjbG91ZCcpCiNpbnN0YWxsLnBhY2thZ2VzKCdlMTA3MScpCiNpbnN0YWxsLnBhY2thZ2VzKCdnbW9kZWxzJykKI2luc3RhbGwucGFja2FnZXMoJ1Nub3diYWxsQycpCgpsaWJyYXJ5KHRtKSAjIExvYWQgdGhlIG5lY2Vzc2FyeSBsaWJyYXJpZXMKbGlicmFyeSh3b3JkY2xvdWQpCmxpYnJhcnkoZTEwNzEpCmxpYnJhcnkoZ21vZGVscykKbGlicmFyeShTbm93YmFsbEMpCmxpYnJhcnkoY2FyZXQpCgpgYGAKCkxvYWQgdGhlIGRhdGFzZXQgdG8gdGhlIFIgZW52aXJvbm1lbnQsIGFuZCByZW1vdmUgdGhlIHRlcm0gIlN1YmplY3Q6IiBhcyBpdCdzIGNvbW1vbiBpbiBlYWNoIG1lc3NhZ2UuIFRoZXJlIGlzIG5vIHBvaW50IG9mIGtlZXBpbmcgY29tbW9uIGNvbnN0YW50IHRlcm1zIGxpa2UgIlN1YmplY3Q6IiBhcyB0aGV5IGRvbid0IGhhdmUgZGlzY3JpbWluYXRpb24gcG93ZXIuCgpgYGB7cn0KbXlEYXRhIDwtIHJlYWQuY3N2KCJzcGFtX2hhbV9kYXRhc2V0LmNzdiIpICMgcmVhZCB0aGUgZGF0YXNldApteURhdGE8LW15RGF0YVssYygibGFiZWwiLCJ0ZXh0IildICMgc2VsZWN0IHR3byBjb2x1bW5zCm15RGF0YSR0ZXh0PC1zdWJzdHJpbmcobXlEYXRhJHRleHQsOSkgIyByZW1vdmluZyAiU3ViamVjdDoiCmBgYAoKQ2hlY2sgdGhlIGRpc3RyaWJ1dGlvbnMgb2Ygd29yZHMgKGEuay5hIGRvY3VtZW50IHRlcm1zKSBpbiBlYWNoIGNsYXNzLiBJZiB0aGUgdGVybSBkaXN0cmlidXRpb25zIGFyZSBkaWZmZXJlbnQsIHdlIGNhbiB1c2UgdGVybSBmcmVxdWVuY2llcyBpbiBhIG1lc3NhZ2UgYXMgZmVhdHVyZXMgdG8gY2xhc3NpZnkgdGhlIG1lc3NhZ2UgdXNpbmcgYW4gTUwgbW9kZWwuCgpgYGB7cn0Kc3BhbU1zZzwtc3Vic2V0KG15RGF0YSxsYWJlbD09InNwYW0iKQpoYW1Nc2c8LXN1YnNldChteURhdGEsbGFiZWw9PSJoYW0iKQojIHdvcmRjbG91ZChzcGFtTXNnJHRleHQsc2NhbGU9Yyg0LC41KSxtaW4uZnJlcT01KSAjIHBsb3QgaWYgdGhlIHdvcmQgYXBwZXJhcyBtb3JlIHRoYW4gNSB0aW1lcyBpbiB0aGUgc3BhbSBtZXNzYWdlcwojIHdvcmRjbG91ZChoYW1Nc2ckdGV4dCxzY2FsZT1jKDQsLjUpLG1pbi5mcmVxPTUpICMgcGxvdCBpZiB0aGUgd29yZCBhcHBlcmFzIG1vcmUgdGhhbiA1IHRpbWVzIGluIHRoZSBoYW0gbWVzc2FnZXMKYGBgCgpBcyB3ZSBjYW4gc2VlIGluIHRoZSBhYm92ZSBvdXRwdXQsIHRlcm0gZGlzdHJpYnV0aW9ucyBhcmUgZGlmZmVyZW50LCBzbyB3ZSBjYW4gdHJhaW4gYSBNTCBtb2RlbCAoTkIgaW4gb3VyIGNhc2UpIHRvIGNsYXNzaWZ5IG91ciBtZXNzYWdlcy4KCioqQnVpbGRpbmcgYW4gTkIgYmFzZWQgc3BhbSBjbGFzc2lmaWVyOioqIE5vdyB3ZSB3aWxsIHRyYWluIG91ciBOQiBjbGFzc2nvrIFlciB1c2luZyB0aGUgYWJvdmUgZGF0YXNldC4gV2Ugd2lsbCB1dGlsaXplIGUxMDcxIHBhY2thZ2UgaW4gUiBmb3IgdGhpcyBwdXJwb3NlLiBUbyB0aGlzIGVuZCwgd2UgbmVlZCB0byBmb2xsb3cgZm9sbG93aW5nIHN0ZXBzLAoKc3RlcCAxLiBXZSBuZWVkIHRvIGNyZWF0ZSBhIGRvY3VtZW50IHRlcm0gbWF0cml4IChEVE0pIC0gYSBtYXRyaXggdGhhdCBkZXNjcmliZXMgdGhlIGZyZXF1ZW5jeSBvZiB0ZXJtcyBvY2N1cmVkIGluIG91ciBtZXNzYWdlIGNvbGxlY3Rpb24uCgpgYGB7cn0KbXlDb3JwdXMgPC0gVkNvcnB1cyhWZWN0b3JTb3VyY2UobXlEYXRhJHRleHQpKQoKbXlEVE0gPC0gRG9jdW1lbnRUZXJtTWF0cml4KG15Q29ycHVzLCBjb250cm9sID0gbGlzdCgKICB0b2xvd2VyPVQsCiAgcmVtb3ZlTnVtYmVycz1ULAogIHJlbW92ZVB1bmN0dWF0aW9uPVQsCiAgc3RlbT1UCikpCmBgYAoKTGV04oCZcyB1c2Ugb25seSB0ZXJtcyB3aGljaCBoYXZlIGZyZXF1ZW5jeSA+PTUgYXMgZmVhdHVyZXMgaW4gb3VyIG1vZGVsIGJ1aWxkaW5nLgoKYGBge3J9CmZyZXFXb3JkcyA8LSBmaW5kRnJlcVRlcm1zKG15RFRNLDUpCm15RFRNIDwtIG15RFRNWyxmcmVxV29yZHNdCmBgYAoKc3RlcCAyLiBTcGxpdCB0aGUgZGF0YXNldCBpbnRvIHRyYWluIGFuZCB0ZXN0IHNldHMuIExhdGVyIHdlIGFyZSBnb2luZyB0byBwb2lzb24gdGhlIHRlc3Qgc2V0ISBXZeKAmXJlIGdvaW5nIHRvIHVzZSBhbiA4MC8yMCBwYXJ0aXRpb25pbmcgZm9yIHRoZSB0cmFpbmluZyBhbmQgdGVzdGluZy4gV2XigJlsbCB1c2UgdGhlIGNyZWF0ZURhdGFQYXJ0aXRpb24gZnVuY3Rpb24gZnJvbSB0aGUgY2FyZXQgcGFja2FnZSBmb3IgdGhpcyBwdXJwb3NlLgoKYGBge3J9CnRyX2luZGV4IDwtIGNyZWF0ZURhdGFQYXJ0aXRpb24obXlEYXRhJGxhYmVsLCBwPTAuODAsIGxpc3Q9RkFMU0UpICMgTGlzdCBvZiA4MCUgb2YgdGhlIHJvd3MKdHJhaW5TZXQgPC0gbXlEYXRhW3RyX2luZGV4LF0gIyBzZWxlY3QgODAlIG9mIHRoZSBkYXRhIGZvciB0aGUgdHJhaW5TZXQKdGVzdFNldCA8LSBteURhdGFbLXRyX2luZGV4LF0gIyBTZWxlY3QgdGhlIHJlbWFpbmluZyAyMCUgb2YgZGF0YSBmb3IgdGVzdFNldApgYGAKClNpbmNlIHdlIGFyZSBjcmVhdGluZyBvdXIgTkIgbW9kZWwgd2l0aCB0aGUgRFRNIGVudHJpZXMsIHdlIHNob3VsZCBvYnRhaW4gY29ycmVzcG9uZGluZyBEVE0gZW50cmllcyBmb3IgdGhlIGRhdGEgaW4gdHJhaW5TZXQgYW5kIHRlc3RTZXQuCgpgYGB7cn0KbXlEVE1UcmFpbiA8LSBteURUTVt0cl9pbmRleCxdCm15RFRNVGVzdCA8LSBteURUTVstdHJfaW5kZXgsXQpgYGAKCgpgYGB7cn0KY29udmVydF9jb3VudHMgPC0gZnVuY3Rpb24oeCkgewogIHggPC0gaWZlbHNlKHggPiAwLCAxLCAwKQp9CgpteURUTVRyYWluTmV3IDwtIGFwcGx5KG15RFRNVHJhaW4sIE1BUkdJTiA9IDIsY29udmVydF9jb3VudHMpCm15RFRNVGVzdE5ldyA8LSBhcHBseShteURUTVRlc3QsIE1BUkdJTiA9IDIsIGNvbnZlcnRfY291bnRzKQpgYGAKCgoKYGBge3J9Cm1zZ0NsYXNzaWZpZXIgPC0gbmFpdmVCYXllcyhteURUTVRyYWluTmV3LCB0cmFpblNldCRsYWJlbCkKdGVzdFByZWRpY3QgPC0gcHJlZGljdChtc2dDbGFzc2lmaWVyLCBteURUTVRlc3ROZXcpCmBgYAoKYGBge3J9CmNvbmZ1c2lvbk1hdHJpeCh0ZXN0UHJlZGljdCwgdGVzdFNldCRsYWJlbCkgIyBQcmludCBjb25mdXNpb24gbWF0cml4IApgYGAKCg==</div>
+          Reference
+Prediction ham spam
+      ham  556  220
+      spam 178   79
+                                          
+               Accuracy : 0.6147          
+                 95% CI : (0.5843, 0.6445)
+    No Information Rate : 0.7106          
+    P-Value [Acc &gt; NIR] : 1.00000         
+                                          
+                  Kappa : 0.0227          
+                                          
+ Mcnemar's Test P-Value : 0.03987         
+                                          
+            Sensitivity : 0.26421         
+            Specificity : 0.75749         
+         Pos Pred Value : 0.30739         
+         Neg Pred Value : 0.71649         
+             Prevalence : 0.28945         
+         Detection Rate : 0.07648         
+   Detection Prevalence : 0.24879         
+      Balanced Accuracy : 0.51085         
+                                          
+       'Positive' Class : spam            
+                                          </code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>As you can see in the confusion matrix, the misclassification of spam as ham (false negative) increases from 67 to 220. Adding more hap like words at the end of spam messages attacker can increase the false negative number further.</p>
+<!-- rnb-text-end -->
+
+<div id="rmd-source-code">LS0tCnRpdGxlOiAiQmF5ZXNpYW4gcG9pc29uaW5nIgpvdXRwdXQ6CiAgcGRmX2RvY3VtZW50OiBkZWZhdWx0CiAgaHRtbF9kb2N1bWVudDoKICAgIGRmX3ByaW50OiBwYWdlZAogIGh0bWxfbm90ZWJvb2s6IGRlZmF1bHQKLS0tClRoZSBwdXJwb3NlIG9mIHRoaXMgY29kZSBzbmlwcGV0IGlzIHRvIGRlbW9uc3RyYXRlIHRvIHRoZSByZWFkZXIgaG93IGEgTmFpdmUgQmF5ZXMgKE5CKSBjbGFzc2nvrIFlciBpcyB2dWxuZXJhYmxlIHRvIEJheWVzaWFuIHBvaXNvbmluZyBhdHRhY2tzLiBCYXllc2lhbiBwb2lzb25pbmcgaXMgYSB0ZWNobmlxdWUgdXNlZCBieSBlbWFpbCBzcGFtbWVycyB0byBjb21wcm9taXNlIHRoZSBl76yAZWN0aXZlbmVzcyBvZiBCYXllc2lhbi1iYXNlZCBzcGFtIO+sgWx0ZXJzIGJ5IGFkZGluZyBub24tc3BhbW1pbmcgKGhhbSkgbGlrZSB3b3JkcyBhdCB0aGUgZW5kIG9mIGEgc3BhbSBtZXNzYWdlLiBBcyBhIHJlc3VsdCwgdGhlIHNwYW0g76yBbHRlciBjb25zaWRlcnMgdGhlIG1lc3NhZ2UgdG8gYmUgbGVnaXRpbWF0ZSAtIGEgVHlwZSBJSSBzdGF0aXN0aWNhbCBlcnJvci4gV2UgdXNlIHRoZSBSIGxhbmd1YWdlIGluIHRoaXMgaW1wbGVtZW50YXRpb24uCgoqKlRoZSBkYXRhc2V0OioqIFdlIHV0aWxpc2UgdGhlIGRhdGFzZXQgYXQgaHR0cHM6Ly93d3cua2FnZ2xlLmNvbS92ZW5reTczL3NwYW0tbWFpbHMtZGF0YXNldCBmb3IgdGhpcyBwdXJwb3NlLiAKCioqTWFjaGluZSBsZWFybmluZyAoTUwpIHRhc2s6KiogT3VyIE1MIHRhc2sgaW4gdGhpcyBwcm9ibGVtIHdvdWxkIGJlIGEgY2xhc3Np76yBY2F0aW9uLiBGaXJzdCwgd2UgZGV2ZWxvcCBhIEJheWVzaWFuLWJhc2VkIHNwYW0g76yBbHRlciB1c2luZyB0aGUgYWJvdmUgZW1haWwgcmVwb3NpdG9yeSAocmF3IGVtYWlscykgYW5kIHRoZW4gcGVyZm9ybSBhIEJheWVzaWFuIHBvaXNvbmluZyBhdHRhY2sgdG8gYnlwYXNzIHRoZSBzZWN1cml0eSBjb250cm9sLiBUbyB0aGlzIGVuZCwgd2UgcG9pc29uIHRoZSB0ZXN0IGRhdGEgaW50byB0aGUgc3BhbSDvrIFsdGVyIGFuZCBieXBhc3MgdGhlIHNlY3VyaXR5IGNoZWNrLgoKYGBge3J9CnNldC5zZWVkKDEyMzQ1KSAjIFNldCB0aGUgc2VlZCB2YWx1ZSBzbyB0aGF0IHRoZSBzYW1lIHJlc3VsdCBpcyBhY2hpZXZlZCBpbiBlYWNoIHJlcGxpY2F0aW9uCgojaW5zdGFsbC5wYWNrYWdlcygndG0nKSAjIEluc3RhbGwgdGhlIHJlcXVpcmVkIGxpYnJhcmllcyBpZiB5b3VyIHN5c3RlbSBkb2VzIG5vdCBoYXZlIHRoZW0KI2luc3RhbGwucGFja2FnZXMoJ3dvcmRjbG91ZCcpCiNpbnN0YWxsLnBhY2thZ2VzKCdlMTA3MScpCiNpbnN0YWxsLnBhY2thZ2VzKCdnbW9kZWxzJykKI2luc3RhbGwucGFja2FnZXMoJ1Nub3diYWxsQycpCgpsaWJyYXJ5KHRtKSAjIExvYWQgdGhlIG5lY2Vzc2FyeSBsaWJyYXJpZXMKbGlicmFyeSh3b3JkY2xvdWQpCmxpYnJhcnkoZTEwNzEpCmxpYnJhcnkoZ21vZGVscykKbGlicmFyeShTbm93YmFsbEMpCmxpYnJhcnkoY2FyZXQpCgpgYGAKCkxvYWQgdGhlIGRhdGFzZXQgdG8gdGhlIFIgZW52aXJvbm1lbnQsIGFuZCByZW1vdmUgdGhlIHRlcm0gIlN1YmplY3Q6IiBhcyBpdCdzIGNvbW1vbiBpbiBlYWNoIG1lc3NhZ2UuIFRoZXJlIGlzIG5vIHBvaW50IG9mIGtlZXBpbmcgY29tbW9uIGNvbnN0YW50IHRlcm1zIGxpa2UgIlN1YmplY3Q6IiBhcyB0aGV5IGRvbid0IGhhdmUgZGlzY3JpbWluYXRpb24gcG93ZXIuCgpgYGB7cn0KbXlEYXRhIDwtIHJlYWQuY3N2KCJzcGFtX2hhbV9kYXRhc2V0LmNzdiIpICMgcmVhZCB0aGUgZGF0YXNldApteURhdGE8LW15RGF0YVssYygibGFiZWwiLCJ0ZXh0IildICMgc2VsZWN0IHR3byBjb2x1bW5zCm15RGF0YSR0ZXh0PC1zdWJzdHJpbmcobXlEYXRhJHRleHQsOSkgIyByZW1vdmluZyAiU3ViamVjdDoiCmBgYAoKQ2hlY2sgdGhlIGRpc3RyaWJ1dGlvbnMgb2Ygd29yZHMgKGEuay5hIGRvY3VtZW50IHRlcm1zKSBpbiBlYWNoIGNsYXNzLiBJZiB0aGUgdGVybSBkaXN0cmlidXRpb25zIGFyZSBkaWZmZXJlbnQsIHdlIGNhbiB1c2UgdGVybSBmcmVxdWVuY2llcyBpbiBhIG1lc3NhZ2UgYXMgZmVhdHVyZXMgdG8gY2xhc3NpZnkgdGhlIG1lc3NhZ2UgdXNpbmcgYW4gTUwgbW9kZWwuCgpgYGB7cn0Kc3BhbU1zZzwtc3Vic2V0KG15RGF0YSxsYWJlbD09InNwYW0iKQpoYW1Nc2c8LXN1YnNldChteURhdGEsbGFiZWw9PSJoYW0iKQojIHdvcmRjbG91ZChzcGFtTXNnJHRleHQsc2NhbGU9Yyg0LC41KSxtaW4uZnJlcT01KSAjIHBsb3QgaWYgdGhlIHdvcmQgYXBwZXJhcyBtb3JlIHRoYW4gNSB0aW1lcyBpbiB0aGUgc3BhbSBtZXNzYWdlcwojIHdvcmRjbG91ZChoYW1Nc2ckdGV4dCxzY2FsZT1jKDQsLjUpLG1pbi5mcmVxPTUpICMgcGxvdCBpZiB0aGUgd29yZCBhcHBlcmFzIG1vcmUgdGhhbiA1IHRpbWVzIGluIHRoZSBoYW0gbWVzc2FnZXMKYGBgCgpBcyB3ZSBjYW4gc2VlIGluIHRoZSBhYm92ZSBvdXRwdXQsIHRlcm0gZGlzdHJpYnV0aW9ucyBhcmUgZGlmZmVyZW50LCBzbyB3ZSBjYW4gdHJhaW4gYSBNTCBtb2RlbCAoTkIgaW4gb3VyIGNhc2UpIHRvIGNsYXNzaWZ5IG91ciBtZXNzYWdlcy4KCioqQnVpbGRpbmcgYW4gTkIgYmFzZWQgc3BhbSBjbGFzc2lmaWVyOioqIE5vdyB3ZSB3aWxsIHRyYWluIG91ciBOQiBjbGFzc2nvrIFlciB1c2luZyB0aGUgYWJvdmUgZGF0YXNldC4gV2Ugd2lsbCB1dGlsaXplIGUxMDcxIHBhY2thZ2UgaW4gUiBmb3IgdGhpcyBwdXJwb3NlLiBUbyB0aGlzIGVuZCwgd2UgbmVlZCB0byBmb2xsb3cgZm9sbG93aW5nIHN0ZXBzLAoKc3RlcCAxLiBXZSBuZWVkIHRvIGNyZWF0ZSBhIGRvY3VtZW50IHRlcm0gbWF0cml4IChEVE0pIC0gYSBtYXRyaXggdGhhdCBkZXNjcmliZXMgdGhlIGZyZXF1ZW5jeSBvZiB0ZXJtcyBvY2N1cmVkIGluIG91ciBtZXNzYWdlIGNvbGxlY3Rpb24uCgpgYGB7cn0KbXlDb3JwdXMgPC0gVkNvcnB1cyhWZWN0b3JTb3VyY2UobXlEYXRhJHRleHQpKQoKbXlEVE0gPC0gRG9jdW1lbnRUZXJtTWF0cml4KG15Q29ycHVzLCBjb250cm9sID0gbGlzdCgKICB0b2xvd2VyPVQsCiAgcmVtb3ZlTnVtYmVycz1ULAogIHJlbW92ZVB1bmN0dWF0aW9uPVQsCiAgc3RvcHdvcmRzID0gVFJVRSwKICBzdGVtPVQKKSkKCmBgYAoKTGV04oCZcyB1c2Ugb25seSB0ZXJtcyB3aGljaCBoYXZlIGZyZXF1ZW5jeSA+PTUgYXMgZmVhdHVyZXMgaW4gb3VyIG1vZGVsIGJ1aWxkaW5nLgoKYGBge3J9CmZyZXFXb3JkcyA8LSBmaW5kRnJlcVRlcm1zKG15RFRNLDUpCm15RFRNIDwtIG15RFRNWyxmcmVxV29yZHNdCmBgYAoKc3RlcCAyLiBTcGxpdCB0aGUgZGF0YXNldCBpbnRvIHRyYWluIGFuZCB0ZXN0IHNldHMuIExhdGVyIHdlIGFyZSBnb2luZyB0byBwb2lzb24gdGhlIHRlc3Qgc2V0ISBXZeKAmXJlIGdvaW5nIHRvIHVzZSBhbiA4MC8yMCBwYXJ0aXRpb25pbmcgZm9yIHRoZSB0cmFpbmluZyBhbmQgdGVzdGluZy4gV2XigJlsbCB1c2UgdGhlIGNyZWF0ZURhdGFQYXJ0aXRpb24gZnVuY3Rpb24gZnJvbSB0aGUgY2FyZXQgcGFja2FnZSBmb3IgdGhpcyBwdXJwb3NlLgoKYGBge3J9CnRyX2luZGV4IDwtIGNyZWF0ZURhdGFQYXJ0aXRpb24obXlEYXRhJGxhYmVsLCBwPTAuODAsIGxpc3Q9RkFMU0UpICMgTGlzdCBvZiA4MCUgb2YgdGhlIHJvd3MKdHJhaW5TZXQgPC0gbXlEYXRhW3RyX2luZGV4LF0gIyBzZWxlY3QgODAlIG9mIHRoZSBkYXRhIGZvciB0aGUgdHJhaW5TZXQKdGVzdFNldCA8LSBteURhdGFbLXRyX2luZGV4LF0gIyBTZWxlY3QgdGhlIHJlbWFpbmluZyAyMCUgb2YgZGF0YSBmb3IgdGVzdFNldApgYGAKClNpbmNlIHdlIGFyZSBjcmVhdGluZyBvdXIgTkIgbW9kZWwgd2l0aCB0aGUgRFRNIGVudHJpZXMsIHdlIHNob3VsZCBvYnRhaW4gY29ycmVzcG9uZGluZyBEVE0gZW50cmllcyBmb3IgdGhlIGRhdGEgaW4gdHJhaW5TZXQgYW5kIHRlc3RTZXQuCgpgYGB7cn0KbXlEVE1UcmFpbiA8LSBteURUTVt0cl9pbmRleCxdCm15RFRNVGVzdCA8LSBteURUTVstdHJfaW5kZXgsXQpgYGAKCgpgYGB7cn0KY29udmVydF9jb3VudHMgPC0gZnVuY3Rpb24oeCkgewogIHggPC0gaWZlbHNlKHggPiAwLCAiWSIsICJOIikKfQoKbXlEVE1UcmFpbk5ldyA8LSBhcHBseShteURUTVRyYWluLCBNQVJHSU4gPSAyLGNvbnZlcnRfY291bnRzKQpteURUTVRlc3ROZXcgPC0gYXBwbHkobXlEVE1UZXN0LCBNQVJHSU4gPSAyLCBjb252ZXJ0X2NvdW50cykKYGBgCgoKCmBgYHtyfQptc2dDbGFzc2lmaWVyIDwtIG5haXZlQmF5ZXMobXlEVE1UcmFpbk5ldywgdHJhaW5TZXQkbGFiZWwpCnRlc3RQcmVkaWN0IDwtIHByZWRpY3QobXNnQ2xhc3NpZmllciwgbXlEVE1UZXN0TmV3KQpgYGAKCmBgYHtyfQpjb25mdXNpb25NYXRyaXgodGVzdFByZWRpY3QsIHRlc3RTZXQkbGFiZWwsIHBvc2l0aXZlID0gInNwYW0iKSAjIFByaW50IGNvbmZ1c2lvbiBtYXRyaXggCmBgYAoKKipCYXllc2lhbiBwb2lzb25pbmc6KiogTGV0J3MgcG9pc29uIHRoZSB0ZXN0IGRhdGEgdG8gYnlwYXNzIHRoZSBhYm92ZSBzcGFtIGZpbHRlci4gVG8gdGhpcyBlbmQsIHJhbmRvbWx5IHNlbGVjdGVkIG5vbi1zcGFtIG1lc3NhZ2VzIGFyZSBhbW1lbmRlZCBhdCB0aGUgZW5kIG9mIHNwYW0gbWVzc2FnZXMgaW4gb3VyIHRlc3QgZGF0YXNldC4KYGBge3J9CiMjIyBQb2lzb24gdGhlIHRlc3QgZGF0YQpzcGFtVGVzdENhc2VzIDwtIHN1YnNldCh0ZXN0U2V0LGxhYmVsPT0ic3BhbSIpCmhhbVRlc3RDYXNlcyA8LSBzdWJzZXQodGVzdFNldCwgbGFiZWw9PSJoYW0iKQpoYW1Nc2dJbm15RGF0YTwtc3Vic2V0KG15RGF0YSwgbGFiZWw9PSJoYW0iKQpoYW1Nc2cyYW1tZW5kPC1oYW1Nc2dJbm15RGF0YVtzYW1wbGUobnJvdyhoYW1Nc2dJbm15RGF0YSksIG5yb3coaGFtVGVzdENhc2VzKSksIF0KaGFtVGVzdENhc2VzJHRleHQgPC1wYXN0ZShoYW1UZXN0Q2FzZXMkdGV4dCxoYW1Nc2cyYW1tZW5kJHRleHQsc2VwID0gIiAiKQpwb2lzVGVzdERhdGE8LXJiaW5kKGhhbVRlc3RDYXNlcyxzcGFtVGVzdENhc2VzKQpteURhdGFbLXRyX2luZGV4LF08LXBvaXNUZXN0RGF0YQpgYGAKCkNyZWF0ZSB0aGUgbmV3IERUTSB3aXRoIHBvaXNvbiBkYXRhIGFuZCByZW1vdmUgbG93IGZyZXF1ZW5jeSB3b3JkcwpgYGB7cn0KbXlDb3JwdXNQb2lzb25lZCA8LSBWQ29ycHVzKFZlY3RvclNvdXJjZShteURhdGEkdGV4dCkpCgpteURUTVBvaXNvbmVkIDwtIERvY3VtZW50VGVybU1hdHJpeChteUNvcnB1cywgY29udHJvbCA9IGxpc3QoCiAgdG9sb3dlcj1ULAogIHJlbW92ZU51bWJlcnM9VCwKICByZW1vdmVQdW5jdHVhdGlvbj1ULAogIHN0b3B3b3JkcyA9IFQsCiAgc3RlbT1UCikpCgpmcmVxV29yZHMgPC0gZmluZEZyZXFUZXJtcyhteURUTVBvaXNvbmVkLDUpCm15RFRNUG9pc29uZWQgPC0gbXlEVE1Qb2lzb25lZFssZnJlcVdvcmRzXQoKbXlEVE1UZXN0UG9pc29uZWQgPC0gbXlEVE1Qb2lzb25lZFstdHJfaW5kZXgsXSAjIG5ldyB0ZXN0IHNldCwgZG8gbm90IG5lZWQgdHJhaW4gc2V0IGFzIHdlIHVzZSB0aGUgc2FtZSBtb2RlbAoKCm15RFRNVGVzdE5ld1BvaXNvbmVkIDwtIGFwcGx5KG15RFRNVGVzdFBvaXNvbmVkLCBNQVJHSU4gPSAyLCBjb252ZXJ0X2NvdW50cykgIyBjb252ZXJ0IHRvIGNhdGVnb3JpY2FsCgpgYGAKCgpgYGB7cn0KdGVzdFByZWRpY3RQb2lzb25lZCA8LSBwcmVkaWN0KG1zZ0NsYXNzaWZpZXIsIG15RFRNVGVzdE5ld1BvaXNvbmVkKQpgYGAKCmBgYHtyfQpjb25mdXNpb25NYXRyaXgodGVzdFByZWRpY3RQb2lzb25lZCwgdGVzdFNldCRsYWJlbCwgcG9zaXRpdmUgPSAic3BhbSIpICMgUHJpbnQgY29uZnVzaW9uIG1hdHJpeCBmb3IgcG9pc29uZWQgZGF0YQoKYGBgCkFzIHlvdSBjYW4gc2VlIGluIHRoZSBjb25mdXNpb24gbWF0cml4LCB0aGUgbWlzY2xhc3NpZmljYXRpb24gb2Ygc3BhbSBhcyBoYW0gKGZhbHNlIG5lZ2F0aXZlKSBpbmNyZWFzZXMgZnJvbSA2NyB0byAyMjAuIEFkZGluZyBtb3JlIGhhcCBsaWtlIHdvcmRzIGF0IHRoZSBlbmQgb2Ygc3BhbSBtZXNzYWdlcyBhdHRhY2tlciBjYW4gaW5jcmVhc2UgdGhlIGZhbHNlIG5lZ2F0aXZlIG51bWJlciBmdXJ0aGVyLgo=</div>
 
 
 
