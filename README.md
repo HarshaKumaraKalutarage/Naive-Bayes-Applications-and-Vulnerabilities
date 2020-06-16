@@ -6,4 +6,5 @@ The purpose of code snippets provided in this repository is to demonstrate to th
 
 **Citation request:**
 If you found this post and/or the R code snippet provided to be useful, please be kind enough to cite below article in your work:
+
 Wickramasinghe, I., & Kalutarage, H. (2020). Naive Bayes: Applications, Variations and Vulnerabilities- A Review of Literature with Implementation Code Snippets. Soft Computing (accepted with revisions).
