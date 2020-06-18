@@ -1,4 +1,4 @@
-**Naive Bayes: Applications, Variations and Vulnerabilities- A Review of Literature with Implementation Code Snippets**
+**Naive Bayes: Applications, Variations and Vulnerabilities- A Review of Literature with Code Snippets for Implementation**
 
 By Indika Wickramasinghe and Harsha Kalutarage
 
