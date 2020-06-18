@@ -8,7 +8,7 @@ output:
 ---
 The purpose of this code snippet is to demonstrate to the reader how a Naive Bayes (NB) classiﬁer can be trained on a given dataset using the R language.
 
-**The dataset:** In order to implement the above code, we use the well-known Iris dataset(included with R) for this purpose. It consists of four features (measurements), namely sepal length, sepal width, petal length, and petal width for 150 ﬂowers.  The dataset contains information about three types of iris plants: Setosa, Versicolor and Virginica.
+**The dataset:** In order to implement the above code, we use the well-known Iris dataset (included with R). It consists of four features (measurements), namely sepal length, sepal width, petal length, and petal width for 150 ﬂowers.  The dataset contains information about three types of iris plants: Setosa, Versicolor and Virginica. In the R package, likelihoods in the Naive Bayes formula for categorical features (e.g. measurements) are calculated using probability distributions.
 
 **Machine learning (ML) task:** We will train a NB model to identify the plant type based on the four measurements of a given flower. So, our ML task in this problem would be a classification.
 ```{r}
