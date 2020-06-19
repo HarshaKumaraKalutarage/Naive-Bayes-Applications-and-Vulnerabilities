@@ -24,7 +24,7 @@ levels(mydata$Species) # check different levels (values) for each class
 head(mydata) # have a look at top data points in mydata
 summary(mydata) # some descriptive statitics of the data and a summary of class distributions
 ```
-**Creating training and validation datasets:** We’re going to construct a 80/20 partitioning for the training and validation sets. We use the createDataPartition function from the caret package for this purpose.
+**Creating training and validation datasets:** We’re going to follow the convention of 80/20 samples ratio to partition the dataset to the training and validation sets. We use the createDataPartition function from the caret package for this purpose.
 ```{r}
 #install.packages("caret") #If the caret package is not installed on your system, uncomment this line to install it first
 library(caret) #Loading the library
