@@ -8,7 +8,10 @@ output:
 ---
 The main purpose of this document is to educate the reader with the practical aspect of the application of the Naive Bayes (NB) algorithm. In this direction, here we provide the necessary code snippet to show the reader how to apply the NB algorithm in a data classification problem. We use a publicly available dataset and R language for this demonstration. All the important steps of the implementation of the algorithm are explined below.
 
-**The dataset:** In order to implement the above code, we use the well-known Iris dataset(included with R) for this purpose. It consists of four features (measurements), namely sepal length, sepal width, petal length, and petal width for 150 ﬂowers.  The dataset contains information about three types of iris plants: Setosa, Versicolor and Virginica.
+**The dataset:** The dataset: In order to implement the NB algorithm, we use the well-known Iris dataset(included with R). 
+It consists of five measurements, plant specie, and some characteristics of 150 flowers. The dataset records  
+four features of the flower, namely sepal length, sepal width, petal length, and petal width and three 
+species of iris plants: Setosa, Versicolor, and Virginica.
 
 **Machine learning (ML) task:** We will train a NB model to identify the plant type based on the four measurements of a given flower. So, our ML task in this problem would be a classification.
 ```{r}
