@@ -13,7 +13,8 @@ It consists of five measurements, plant specie, and some characteristics of 150 
 four features of the flower, namely sepal length, sepal width, petal length, and petal width and three 
 species of iris plants: Setosa, Versicolor, and Virginica.
 
-**Machine learning (ML) task:** We will train a NB model to identify the plant type based on the four measurements of a given flower. So, our ML task in this problem would be a classification.
+**Machine learning (ML) task:** In this application, we aim to construct an ML model using NB algorithm to identify (classify) the specie of an Irish flower, based on the values of the four features ( sepal length, sepal width, petal length, and petal width ) of a given Irish flower.  
+
 ```{r}
 data(iris) # Attach the Iris dataset to the R environment
 mydata <- iris # Let's rename the dataset as mydata
