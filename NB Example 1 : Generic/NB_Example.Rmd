@@ -6,7 +6,7 @@ output:
   html_notebook: default
   pdf_document: default
 ---
-The purpose of this code snippet is to demonstrate to the reader how a Naive Bayes (NB) classiﬁer can be trained on a given dataset using the R language.
+The main purpose of this document is to educate the reader with the practical aspect of the application of the Naive Bayes (NB) algorithm. In this direction, here we provide the necessary code snippet to show the reader how to apply the NB algorithm in a data classification problem. We use a publicly available dataset and R language for this demonstration. All the important steps of the implementation of the algorithm are explined below.
 
 **The dataset:** In order to implement the above code, we use the well-known Iris dataset(included with R) for this purpose. It consists of four features (measurements), namely sepal length, sepal width, petal length, and petal width for 150 ﬂowers.  The dataset contains information about three types of iris plants: Setosa, Versicolor and Virginica.
 
