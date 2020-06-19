@@ -32,7 +32,8 @@ tr_index <- createDataPartition(mydata$Species, p=0.80, list=FALSE) # List of 80
 trainSet <- mydata[tr_index,] # select 80% of the data for the trainSet
 testSet <- mydata[-tr_index,] # Select the remaining 20% of data for testSet
 ```
-**Building a NB classifier:** Now we will train our NB classiﬁer using the above trainSet. For this purpose, we will utilize e1071 package in R. Note the priori probabilities when outputting the following lines of code. We get the same priori probabilities for all classes.
+**Building a NB classifier:** Now we will train our NB classiﬁer using the above trainSet. For this purpose, we will utilize e1071 package in R. Note that the priori probabilities can be computed using the following lines of code. In this case, the 
+priori probabilities for all classes are the same. 
 
 ```{r}
 #install.packages("e1071") #If the e1071 package is not installed on your system, uncomment this line to install it first
