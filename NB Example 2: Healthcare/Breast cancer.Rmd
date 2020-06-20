@@ -1,8 +1,9 @@
 ---
 title: "Breast Cancer Detection"
-output:
-  pdf_document: default
-  html_notebook: default
+graphics: yes
+output: 
+  pdf_document: 
+    keep_tex: true
 ---
 
 Early detection of breast cancer is crucial for successful treatment. Conventional methods such as breast biopsy are more invasive and must be performed by a human specialist. However, samples obtained with less invasive techniques like fine needle aspiration method can be easily digitized and used for computer-aided diagnosis. To this end, the use of machine learning methods can significantly reduce the cost and time for the diagnostic process. This code snippet shows the reader how to train a Naive Bayes (NB) classifier for breast cancer detection.
