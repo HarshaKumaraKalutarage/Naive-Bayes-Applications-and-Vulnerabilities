@@ -6,11 +6,19 @@ output:
   html_notebook: default
   pdf_document: default
 ---
-The purpose of this code snippet is to demonstrate to the reader how a Naive Bayes (NB) classiﬁer can be trained on a given dataset using the R language.
+The main purpose of this document is to educate the reader with the practical aspect of the application of the Naive Bayes (NB) algorithm. In this direction, here we provide the necessary code snippet to show the reader how to apply the NB algorithm in a data classification problem. We use a publicly available dataset and R language for this demonstration. All the important steps of the implementation of the algorithm are explined below.
 
+<<<<<<< HEAD
 **The dataset:** In order to implement the above code, we use the well-known Iris dataset (included with R). It consists of four features (measurements), namely sepal length, sepal width, petal length, and petal width for 150 ﬂowers.  The dataset contains information about three types of iris plants: Setosa, Versicolor and Virginica. In the R package, likelihoods in the Naive Bayes formula for categorical features (e.g. measurements) are calculated using probability distributions.
+=======
+**The dataset:** The dataset: In order to implement the NB algorithm, we use the well-known Iris dataset(included with R). 
+It consists of five measurements, plant specie, and some characteristics of 150 flowers. The dataset records  
+four features of the flower, namely sepal length, sepal width, petal length, and petal width and three 
+species of iris plants: Setosa, Versicolor, and Virginica.
 
-**Machine learning (ML) task:** We will train a NB model to identify the plant type based on the four measurements of a given flower. So, our ML task in this problem would be a classification.
+**Machine learning (ML) task:** In this application, we aim to construct an ML model using NB algorithm to identify (classify) the specie of an Irish flower, based on the values of the four features ( sepal length, sepal width, petal length, and petal width ) of a given Irish flower.  
+>>>>>>> 2507ccafc48f38380f10d07644130485fb487ffd
+
 ```{r}
 data(iris) # Attach the Iris dataset to the R environment
 mydata <- iris # Let's rename the dataset as mydata
@@ -18,9 +26,9 @@ dim(mydata) # check dimensions of mydata
 sapply(mydata, class) # check the data types of each feature
 levels(mydata$Species) # check different levels (values) for each class
 head(mydata) # have a look at top data points in mydata
-summary(mydata) # a summary of class distributions
+summary(mydata) # some descriptive statitics of the data and a summary of class distributions
 ```
-**Creating training and validation datasets:** We’re going to construct a 80/20 partitioning for the training and validation sets. We use the createDataPartition function from the caret package for this purpose.
+**Creating training and validation datasets:** We’re going to follow the convention of 80/20 samples ratio to partition the dataset to the training and validation sets. We use the createDataPartition function from the caret package for this purpose.
 ```{r}
 #install.packages("caret") #If the caret package is not installed on your system, uncomment this line to install it first
 library(caret) #Loading the library
@@ -28,7 +36,8 @@ tr_index <- createDataPartition(mydata$Species, p=0.80, list=FALSE) # List of 80
 trainSet <- mydata[tr_index,] # select 80% of the data for the trainSet
 testSet <- mydata[-tr_index,] # Select the remaining 20% of data for testSet
 ```
-**Building a NB classifier:** Now we will train our NB classiﬁer using the above trainSet. For this purpose, we will utilize e1071 package in R. Note the priori probabilities when outputting the following lines of code. We get the same priori probabilities for all classes.
+**Building a NB classifier:** Now we will train our NB classiﬁer using the above trainSet. For this purpose, we will utilize e1071 package in R. Note that the priori probabilities can be computed using the following lines of code. In this case, the 
+priori probabilities for all classes are the same. 
 
 ```{r}
 #install.packages("e1071") #If the e1071 package is not installed on your system, uncomment this line to install it first

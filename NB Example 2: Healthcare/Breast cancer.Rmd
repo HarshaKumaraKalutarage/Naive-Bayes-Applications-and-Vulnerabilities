@@ -1,6 +1,8 @@
 ---
 title: "Breast Cancer Detection"
-output: html_notebook
+output:
+  pdf_document: default
+  html_notebook: default
 ---
 
 Early detection of breast cancer is crucial for successful treatment. Conventional methods such as breast biopsy are more invasive and must be performed by a human specialist. However, samples obtained with less invasive techniques like fine needle aspiration method can be easily digitized and used for computer-aided diagnosis. To this end, the use of machine learning methods can significantly reduce the cost and time for the diagnostic process. This code snippet shows the reader how to train a Naive Bayes (NB) classifier for breast cancer detection.
@@ -29,7 +31,7 @@ corrplot(M, type="upper", order="hclust", col=brewer.pal(n=10, name="RdYlBu"))
 We notice that the data is slightly imbalanced and there are highly correlated features. However, we do not remove correlated features from the dataset, nor do we deal with the class imbalanced problem of this analysis as the purpose of this post to demonstrate you how to train NB model for the dataset. Therefore we will use our dataset as it's in model building.
 
 **Creating training and validation datasets:** We’re going to construct a 80/20 partitioning for the training and validation sets. We use the createDataPartition function from the caret package for this purpose.
-```{r}
+```{r message=FALSE}
 set.seed(12)
 #install.packages("caret") #If the caret package is not installed on your system, uncomment this line to install it first
 library(caret) #Loading the library
@@ -39,7 +41,7 @@ testSet <- myData[-tr_index,] # Select the remaining 20% of data for testSet
 ```
 **Building a NB classifier:** Now we will train our NB classiﬁer using the above trainSet. For this purpose, we will utilize e1071 package in R. Note the priori probabilities when outputting the following lines of code. We get the same priori probabilities for all classes.
 
-```{r}
+```{r message=FALSE}
 #install.packages("e1071") #If the e1071 package is not installed on your system, uncomment this line to install it first
 library(e1071)
 NBclassfier=naiveBayes(label~., data=trainSet[,2:ncol(trainSet)]) # Once you call this line, R fits the NB model using trainSet
@@ -47,7 +49,7 @@ print(NBclassfier) # Check the newly fitted model to see if everything is OK.
 ```
 
 **Make predictions:** Now let's apply the above model to assign labels for test cases in testSet. Then we create the confusion matrix, a table that is often used to describe the performance of a classifier.
-```{r}
+```{r message=FALSE}
   testPrediction=predict(NBclassfier, newdata=testSet[,2:ncol(testSet)], type="class") # Assign labels for each test case
   confusionMatrix(testPrediction, testSet$label) # Print confusion matrix 
 ```
