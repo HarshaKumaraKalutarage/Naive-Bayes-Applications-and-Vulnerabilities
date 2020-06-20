@@ -6,7 +6,10 @@ output:
     df_print: paged
   html_notebook: default
 ---
-The purpose of this code snippet is to demonstrate to the reader how a Naive Bayes (NB) classiﬁer is vulnerable to Bayesian poisoning attacks. Bayesian poisoning is a technique used by email spammers to compromise the eﬀectiveness of Bayesian-based spam ﬁlters by adding non-spamming (ham) like words at the end of a spam message. As a result, the spam ﬁlter considers the message to be legitimate - a Type II statistical error. We use the R language in this implementation.
+The purpose of this code snippet is to demonstrate to the reader how a Naive Bayes (NB) classiﬁer is vulnerable to Bayesian poisoning attacks.
+Bayesian poisoning is a technique used by email spammers to compromise the eﬀectiveness of Bayesian-based spam ﬁlters by adding non-spamming (ham) like words at the end of a spam message. The aim of spammers is to hamper the probability calculation associated with the NB algorithm. In other words, this increases the type II probability. In hypothesis testing, type II error is referred to as “false negative”, which means not rejecting the null hypothesis when it is false. Therefore, as a result of the Bayesian poisoning, the spammers make the spam filtering system to consider a non-legitimate message a legitimate one. For the implementation of this code,  we use the R language.
+
+
 
 **The dataset:** We utilise the dataset at https://www.kaggle.com/venky73/spam-mails-dataset for this purpose. 
 
