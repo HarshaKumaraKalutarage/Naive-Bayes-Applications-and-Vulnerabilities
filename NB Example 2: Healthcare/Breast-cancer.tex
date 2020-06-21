@@ -127,19 +127,20 @@
 
 Early detection of breast cancer is crucial for successful treatment.
 Conventional methods such as breast biopsy are more invasive and must be
-performed by a human specialist. However, samples obtained with less
-invasive techniques like fine needle aspiration method can be easily
-digitized and used for computer-aided diagnosis. To this end, the use of
-machine learning methods can significantly reduce the cost and time for
-the diagnostic process. This code snippet shows the reader how to train
-a Naive Bayes (NB) classifier for breast cancer detection.
+performed by a human specialist, which would be time consuming and not
+scalable. However, samples obtained with less invasive techniques like
+fine needle aspiration can be easily digitized and used for
+computer-aided diagnosis. To this end, the use of machine learning
+methods can significantly reduce the cost and time for the diagnostic
+process. This code snippet shows the reader how to train a Naive Bayes
+(NB) classifier for breast cancer detection.
 
 \textbf{The dataset:} We utilise the dataset available at
 \url{http://archive.ics.uci.edu/ml/datasets/breast+cancer+wisconsin+\%28diagnostic\%29}
 
-\textbf{Machine learning (ML) task:} We will train a NB model to detect
-the cancer given 30 features of the image. So, our ML task in this
-problem would be a classification. Let's explore the dataset.
+\textbf{Machine learning (ML) task:} Given a feature set we need to
+clasify a tumor as benign or malignant. So, our ML task in this problem
+would be a classification. Let's explore the dataset.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -355,15 +356,15 @@ problem would be a classification. Let's explore the dataset.
 
 We notice that the data is slightly imbalanced and there are highly
 correlated features. However, we do not remove correlated features from
-the dataset, nor do we deal with the class imbalanced problem of this
-analysis as the purpose of this post to demonstrate you how to train NB
-model for the dataset. Therefore we will use our dataset as it's in
-model building.
+the dataset nor deal with the class imbalanced problem in this analysis
+as the purpose of this post to demonstrate you how to train NB model for
+the dataset. Therefore we will use our dataset as it's in model
+building.
 
 \textbf{Creating training and validation datasets:} We're going to
-construct a 80/20 partitioning for the training and validation sets. We
-use the createDataPartition function from the caret package for this
-purpose.
+follow the convention of 80/20 samples ratio to partition the dataset as
+was in the previous example. We use the createDataPartition function
+from the caret package for this purpose.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -378,9 +379,7 @@ purpose.
 
 \textbf{Building a NB classifier:} Now we will train our NB classiﬁer
 using the above trainSet. For this purpose, we will utilize e1071
-package in R. Note the priori probabilities when outputting the
-following lines of code. We get the same priori probabilities for all
-classes.
+package in R.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -562,7 +561,7 @@ table that is often used to describe the performance of a classifier.
 \begin{Shaded}
 \begin{Highlighting}[]
 \NormalTok{  testPrediction=}\KeywordTok{predict}\NormalTok{(NBclassfier, }\DataTypeTok{newdata=}\NormalTok{testSet[,}\DecValTok{2}\OperatorTok{:}\KeywordTok{ncol}\NormalTok{(testSet)], }\DataTypeTok{type=}\StringTok{"class"}\NormalTok{) }\CommentTok{# Assign labels for each test case}
-  \KeywordTok{confusionMatrix}\NormalTok{(testPrediction, testSet}\OperatorTok{$}\NormalTok{label) }\CommentTok{# Print confusion matrix }
+  \KeywordTok{confusionMatrix}\NormalTok{(testPrediction, testSet}\OperatorTok{$}\NormalTok{label, }\DataTypeTok{positive =} \StringTok{"M"}\NormalTok{) }\CommentTok{# Print confusion matrix }
 \end{Highlighting}
 \end{Shaded}
 
@@ -583,22 +582,18 @@ table that is often used to describe the performance of a classifier.
 ##                                           
 ##  Mcnemar's Test P-Value : 1               
 ##                                           
-##             Sensitivity : 0.9577          
-##             Specificity : 0.9048          
-##          Pos Pred Value : 0.9444          
-##          Neg Pred Value : 0.9268          
-##              Prevalence : 0.6283          
-##          Detection Rate : 0.6018          
-##    Detection Prevalence : 0.6372          
+##             Sensitivity : 0.9048          
+##             Specificity : 0.9577          
+##          Pos Pred Value : 0.9268          
+##          Neg Pred Value : 0.9444          
+##              Prevalence : 0.3717          
+##          Detection Rate : 0.3363          
+##    Detection Prevalence : 0.3628          
 ##       Balanced Accuracy : 0.9313          
 ##                                           
-##        'Positive' Class : B               
+##        'Positive' Class : M               
 ## 
 \end{verbatim}
-
-We can see that the accuracy is 93.81\%. It was a small test set, but
-whether or not that accuracy is sufficient depends on the problem
-context and is based on many other factors.
 
 
 \end{document}

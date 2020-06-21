@@ -1,0 +1,425 @@
+\documentclass[]{article}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\usepackage{fixltx2e} % provides \textsubscript
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+\else % if luatex or xelatex
+  \ifxetex
+    \usepackage{mathspec}
+  \else
+    \usepackage{fontspec}
+  \fi
+  \defaultfontfeatures{Ligatures=TeX,Scale=MatchLowercase}
+\fi
+% use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+% use microtype if available
+\IfFileExists{microtype.sty}{%
+\usepackage{microtype}
+\UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\usepackage[margin=1in]{geometry}
+\usepackage{hyperref}
+\hypersetup{unicode=true,
+            pdftitle={Bayesian Poisoning},
+            pdfborder={0 0 0},
+            breaklinks=true}
+\urlstyle{same}  % don't use monospace font for urls
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{graphicx,grffile}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+\IfFileExists{parskip.sty}{%
+\usepackage{parskip}
+}{% else
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt plus 2pt minus 1pt}
+}
+\setlength{\emergencystretch}{3em}  % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{0}
+% Redefines (sub)paragraphs to behave more like sections
+\ifx\paragraph\undefined\else
+\let\oldparagraph\paragraph
+\renewcommand{\paragraph}[1]{\oldparagraph{#1}\mbox{}}
+\fi
+\ifx\subparagraph\undefined\else
+\let\oldsubparagraph\subparagraph
+\renewcommand{\subparagraph}[1]{\oldsubparagraph{#1}\mbox{}}
+\fi
+
+%%% Use protect on footnotes to avoid problems with footnotes in titles
+\let\rmarkdownfootnote\footnote%
+\def\footnote{\protect\rmarkdownfootnote}
+
+%%% Change title format to be more compact
+\usepackage{titling}
+
+% Create subtitle command for use in maketitle
+\providecommand{\subtitle}[1]{
+  \posttitle{
+    \begin{center}\large#1\end{center}
+    }
+}
+
+\setlength{\droptitle}{-2em}
+
+  \title{Bayesian Poisoning}
+    \pretitle{\vspace{\droptitle}\centering\huge}
+  \posttitle{\par}
+    \author{}
+    \preauthor{}\postauthor{}
+    \date{}
+    \predate{}\postdate{}
+  
+
+\begin{document}
+\maketitle
+
+The purpose of this code snippet is to demonstrate to the reader how a
+Naive Bayes (NB) classiﬁer is vulnerable to Bayesian poisoning attacks.
+Bayesian poisoning is a technique used by email spammers to compromise
+the eﬀectiveness of Bayesian-based spam ﬁlters by adding non-spamming
+(ham) like words at the end of a spam message. The aim of spammers is to
+hamper the probability calculation associated with the NB algorithm. In
+other words, this increases the type II probability. In hypothesis
+testing, type II error is referred to as ``false negative'', which means
+not rejecting the null hypothesis when it is false. Therefore, as a
+result of the Bayesian poisoning, the spammers make the spam filtering
+system to consider a non-legitimate message a legitimate one. For the
+implementation of this code, we use the R language.
+
+\textbf{The dataset:} We utilise the dataset at
+\url{https://www.kaggle.com/venky73/spam-mails-dataset}, which contains
+a collection of labeled spam and non-spam email messages for this
+purpose.
+
+\textbf{Machine learning (ML) task:} Our ML task in this problem would
+be to identify the characteristics of spam emails and non-spam emails
+accurately. Thereofore, the aim of this is to seperate a spam email from
+a non-spam one. This can be considered as a classiﬁcation problem.
+First, we develop a Bayesian-based spam ﬁlter using the above email
+repository (raw emails) and then perform a Bayesian poisoning attack to
+bypass the security control. To this end, we poison the test data into
+the spam ﬁlter and bypass the security check.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{set.seed}\NormalTok{(}\DecValTok{12345}\NormalTok{) }\CommentTok{# Set the seed value so that the same result is achieved in each replication}
+
+\CommentTok{#install.packages('tm') # Install the required libraries if your system does not have them}
+\CommentTok{#install.packages('wordcloud')}
+\CommentTok{#install.packages('e1071')}
+\CommentTok{#install.packages('gmodels')}
+\CommentTok{#install.packages('SnowballC')}
+
+\KeywordTok{library}\NormalTok{(tm) }\CommentTok{# Load the necessary libraries}
+\KeywordTok{library}\NormalTok{(wordcloud)}
+\KeywordTok{library}\NormalTok{(e1071)}
+\KeywordTok{library}\NormalTok{(gmodels)}
+\KeywordTok{library}\NormalTok{(SnowballC)}
+\KeywordTok{library}\NormalTok{(caret)}
+\end{Highlighting}
+\end{Shaded}
+
+Load the dataset to the R environment, and remove the term ``Subject:''
+as it's common in each message. There is no point of keeping common
+constant terms like ``Subject:'' as they don't have discrimination
+power.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{myData <-}\StringTok{ }\KeywordTok{read.csv}\NormalTok{(}\StringTok{"spam_ham_dataset.csv"}\NormalTok{) }\CommentTok{# read the dataset}
+\NormalTok{myData<-myData[,}\KeywordTok{c}\NormalTok{(}\StringTok{"label"}\NormalTok{,}\StringTok{"text"}\NormalTok{)] }\CommentTok{# select two columns}
+\NormalTok{myData}\OperatorTok{$}\NormalTok{text<-}\KeywordTok{substring}\NormalTok{(myData}\OperatorTok{$}\NormalTok{text,}\DecValTok{9}\NormalTok{) }\CommentTok{# removing "Subject:"}
+\end{Highlighting}
+\end{Shaded}
+
+Let's check the word distributions (a.k.a. document terms) in each
+class. To this end we use word clouds, in which the size of the word is
+proportional to its frequency in the text. If the word clouds are
+different, we can conclude that words that appear frequently in spams
+differ from words that appear in hams. Therefore, we can use words
+(features) in a text message to classify them as ham or spam.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{spamMsg<-}\KeywordTok{subset}\NormalTok{(myData,label}\OperatorTok{==}\StringTok{"spam"}\NormalTok{)}
+\NormalTok{hamMsg<-}\KeywordTok{subset}\NormalTok{(myData,label}\OperatorTok{==}\StringTok{"ham"}\NormalTok{)}
+\CommentTok{# wordcloud(spamMsg$text,scale=c(4,.5),min.freq=5) # plot if the word apperas more than 5 times in the spam messages, makesure to uncomment this line to produce word cloud}
+\CommentTok{# wordcloud(hamMsg$text,scale=c(4,.5),min.freq=5) # plot if the word apperas more than 5 times in the ham messages,  makesure to uncomment this line to produce word cloud}
+\end{Highlighting}
+\end{Shaded}
+
+As we can see in the word cloud outputs, the term distributions differ
+between spam and ham, so we can train an ML model (in our case, NB) by
+using words as features.
+
+\textbf{Building an NB based spam classifier:} Now we will train our NB
+classiﬁer using the above dataset. We will utilize e1071 package in R
+for this purpose. To this end, we need to follow following steps,
+
+\textbf{Step 1:} We need to create a document term matrix (DTM) - a
+matrix that describes the frequency of terms occured in each message in
+our collection.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{myCorpus <-}\StringTok{ }\KeywordTok{VCorpus}\NormalTok{(}\KeywordTok{VectorSource}\NormalTok{(myData}\OperatorTok{$}\NormalTok{text)) }\CommentTok{# create a corpus}
+
+\NormalTok{myDTM <-}\StringTok{ }\KeywordTok{DocumentTermMatrix}\NormalTok{(myCorpus, }\DataTypeTok{control =} \KeywordTok{list}\NormalTok{(}
+  \DataTypeTok{tolower=}\NormalTok{T,}
+  \DataTypeTok{removeNumbers=}\NormalTok{T,}
+  \DataTypeTok{removePunctuation=}\NormalTok{T,}
+  \DataTypeTok{stopwords =}\NormalTok{ T,}
+  \DataTypeTok{stem=}\NormalTok{T}
+\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+DTM is usually a sparse matrix as most of its entries are filled with
+zeros. Let's use only terms which have frequency \textgreater{}=5 as
+features in our model building. To this end we use the findFreqTerms ()
+function in R as follows. So, we can reduce the number of columns in our
+DTM matrix to 8615, which would be a manageable size in our model
+building.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{freqWords <-}\StringTok{ }\KeywordTok{findFreqTerms}\NormalTok{(myDTM,}\DecValTok{5}\NormalTok{)}
+\NormalTok{myDTM <-}\StringTok{ }\NormalTok{myDTM[,freqWords]}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Step 2:} Split the dataset into train and test sets. Later we
+are going to poison the test set! We're going to use an 80/20
+partitioning for the training and testing. We'll use the
+createDataPartition function from the caret package for this purpose.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{tr_index <-}\StringTok{ }\KeywordTok{createDataPartition}\NormalTok{(myData}\OperatorTok{$}\NormalTok{label, }\DataTypeTok{p=}\FloatTok{0.80}\NormalTok{, }\DataTypeTok{list=}\OtherTok{FALSE}\NormalTok{) }\CommentTok{# List of 80% of the rows}
+\NormalTok{trainSet <-}\StringTok{ }\NormalTok{myData[tr_index,] }\CommentTok{# select 80% of the data for the trainSet}
+\NormalTok{testSet <-}\StringTok{ }\NormalTok{myData[}\OperatorTok{-}\NormalTok{tr_index,] }\CommentTok{# Select the remaining 20% of data for testSet}
+\end{Highlighting}
+\end{Shaded}
+
+Since we are creating our NB model with the DTM entries, we should
+obtain corresponding DTM entries for the data in trainSet and testSet.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{myDTMTrain <-}\StringTok{ }\NormalTok{myDTM[tr_index,]}
+\NormalTok{myDTMTest <-}\StringTok{ }\NormalTok{myDTM[}\OperatorTok{-}\NormalTok{tr_index,]}
+\end{Highlighting}
+\end{Shaded}
+
+Since we want to represent the presence or absence of a certain word
+(feature) in a particular message, we code our DTM as follows.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{convert_counts <-}\StringTok{ }\ControlFlowTok{function}\NormalTok{(x) \{}
+\NormalTok{  x <-}\StringTok{ }\KeywordTok{ifelse}\NormalTok{(x }\OperatorTok{>}\StringTok{ }\DecValTok{0}\NormalTok{, }\StringTok{"T"}\NormalTok{, }\StringTok{"F"}\NormalTok{)}
+\NormalTok{\}}
+\NormalTok{myDTMTrainNew <-}\StringTok{ }\KeywordTok{apply}\NormalTok{(myDTMTrain, }\DataTypeTok{MARGIN =} \DecValTok{2}\NormalTok{,convert_counts)}
+\NormalTok{myDTMTestNew <-}\StringTok{ }\KeywordTok{apply}\NormalTok{(myDTMTest, }\DataTypeTok{MARGIN =} \DecValTok{2}\NormalTok{, convert_counts)}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Step 3:} Building the NB based spam filter.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{NBbasedSpamFilter <-}\StringTok{ }\KeywordTok{naiveBayes}\NormalTok{(myDTMTrainNew, trainSet}\OperatorTok{$}\NormalTok{label) }\CommentTok{# train the model}
+\NormalTok{testPredictMsgLabel <-}\StringTok{ }\KeywordTok{predict}\NormalTok{(NBbasedSpamFilter, myDTMTestNew) }\CommentTok{# predict labels for test cases}
+\end{Highlighting}
+\end{Shaded}
+
+Create the confusion matrix, a table that is often used to describe the
+performance of a classifier.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{confusionMatrix}\NormalTok{(testPredictMsgLabel, testSet}\OperatorTok{$}\NormalTok{label, }\DataTypeTok{positive =} \StringTok{"spam"}\NormalTok{) }\CommentTok{# Print confusion matrix}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Confusion Matrix and Statistics
+## 
+##           Reference
+## Prediction ham spam
+##       ham  704   67
+##       spam  30  232
+##                                           
+##                Accuracy : 0.9061          
+##                  95% CI : (0.8867, 0.9232)
+##     No Information Rate : 0.7106          
+##     P-Value [Acc > NIR] : < 2.2e-16       
+##                                           
+##                   Kappa : 0.763           
+##                                           
+##  Mcnemar's Test P-Value : 0.0002569       
+##                                           
+##             Sensitivity : 0.7759          
+##             Specificity : 0.9591          
+##          Pos Pred Value : 0.8855          
+##          Neg Pred Value : 0.9131          
+##              Prevalence : 0.2894          
+##          Detection Rate : 0.2246          
+##    Detection Prevalence : 0.2536          
+##       Balanced Accuracy : 0.8675          
+##                                           
+##        'Positive' Class : spam            
+## 
+\end{verbatim}
+
+\textbf{Bayesian poisoning:} Let's poison the test data to bypass the
+above spam filter. To this end, randomly selected non-spam messages are
+ammended at the end of spam messages in our test dataset.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{### Poison the test data}
+\NormalTok{spamTestCases <-}\StringTok{ }\KeywordTok{subset}\NormalTok{(testSet,label}\OperatorTok{==}\StringTok{"spam"}\NormalTok{) }\CommentTok{# select spams in test cases}
+\NormalTok{hamTestCases <-}\StringTok{ }\KeywordTok{subset}\NormalTok{(testSet, label}\OperatorTok{==}\StringTok{"ham"}\NormalTok{) }\CommentTok{# select ham in test cases}
+\NormalTok{hamMsgInmyData<-}\KeywordTok{subset}\NormalTok{(myData, label}\OperatorTok{==}\StringTok{"ham"}\NormalTok{) }\CommentTok{# select ham in our original dataset}
+\NormalTok{hamMsg2ammend<-hamMsgInmyData[}\KeywordTok{sample}\NormalTok{(}\KeywordTok{nrow}\NormalTok{(hamMsgInmyData), }\KeywordTok{nrow}\NormalTok{(spamTestCases)), ] }\CommentTok{# select number of ham messages equal to the spam messages in test cases}
+\NormalTok{spamTestCases}\OperatorTok{$}\NormalTok{text <-}\KeywordTok{paste}\NormalTok{(spamTestCases}\OperatorTok{$}\NormalTok{text,hamMsg2ammend}\OperatorTok{$}\NormalTok{text,}\DataTypeTok{sep =} \StringTok{" "}\NormalTok{) }\CommentTok{# ammend selected ham at the end of spams in test cases}
+\NormalTok{poisTestData<-}\KeywordTok{rbind}\NormalTok{(hamTestCases,spamTestCases) }\CommentTok{# create the poisoned test set}
+\NormalTok{myData[}\OperatorTok{-}\NormalTok{tr_index,]<-poisTestData }\CommentTok{# replace the test entries in original dataset with poisoned test cases}
+\end{Highlighting}
+\end{Shaded}
+
+Create the new DTM with poisoned data and select high frequency words.
+Note that we have to create the DTM and split it as we did with original
+data in the above.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{myCorpusPoisoned <-}\StringTok{ }\KeywordTok{VCorpus}\NormalTok{(}\KeywordTok{VectorSource}\NormalTok{(myData}\OperatorTok{$}\NormalTok{text))}
+
+\NormalTok{myDTMPoisoned <-}\StringTok{ }\KeywordTok{DocumentTermMatrix}\NormalTok{(myCorpusPoisoned, }\DataTypeTok{control =} \KeywordTok{list}\NormalTok{(}
+  \DataTypeTok{tolower=}\NormalTok{T,}
+  \DataTypeTok{removeNumbers=}\NormalTok{T,}
+  \DataTypeTok{removePunctuation=}\NormalTok{T,}
+  \DataTypeTok{stopwords =}\NormalTok{ T,}
+  \DataTypeTok{stem=}\NormalTok{T}
+\NormalTok{))}
+
+\NormalTok{freqWords <-}\StringTok{ }\KeywordTok{findFreqTerms}\NormalTok{(myDTMPoisoned,}\DecValTok{5}\NormalTok{)}
+\NormalTok{myDTMPoisoned <-}\StringTok{ }\NormalTok{myDTMPoisoned[,freqWords]}
+
+\NormalTok{myDTMTestPoisoned <-}\StringTok{ }\NormalTok{myDTMPoisoned[}\OperatorTok{-}\NormalTok{tr_index,] }\CommentTok{# new test set, note that we don't need  a training set as we use the same model created above}
+
+\NormalTok{myDTMTestNewPoisoned <-}\StringTok{ }\KeywordTok{apply}\NormalTok{(myDTMTestPoisoned, }\DataTypeTok{MARGIN =} \DecValTok{2}\NormalTok{, convert_counts) }\CommentTok{# Using the same convert_counts function, we code our poisoned test DTM as did in Step 2 above.}
+\end{Highlighting}
+\end{Shaded}
+
+Predict labels for poisoned test cases, note that we use the same
+NBbasedSpamFilter trained above.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{poisonedTestPredictMsgLabel <-}\StringTok{ }\KeywordTok{predict}\NormalTok{(NBbasedSpamFilter, myDTMTestNewPoisoned)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{confusionMatrix}\NormalTok{(poisonedTestPredictMsgLabel, testSet}\OperatorTok{$}\NormalTok{label, }\DataTypeTok{positive =} \StringTok{"spam"}\NormalTok{) }\CommentTok{# Print confusion matrix for poisoned data}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Confusion Matrix and Statistics
+## 
+##           Reference
+## Prediction ham spam
+##       ham  641  256
+##       spam  93   43
+##                                          
+##                Accuracy : 0.6621         
+##                  95% CI : (0.6324, 0.691)
+##     No Information Rate : 0.7106         
+##     P-Value [Acc > NIR] : 0.9997         
+##                                          
+##                   Kappa : 0.0204         
+##                                          
+##  Mcnemar's Test P-Value : <2e-16         
+##                                          
+##             Sensitivity : 0.14381        
+##             Specificity : 0.87330        
+##          Pos Pred Value : 0.31618        
+##          Neg Pred Value : 0.71460        
+##              Prevalence : 0.28945        
+##          Detection Rate : 0.04163        
+##    Detection Prevalence : 0.13166        
+##       Balanced Accuracy : 0.50855        
+##                                          
+##        'Positive' Class : spam           
+## 
+\end{verbatim}
+
+As you can see in the confusion matrix, the misclassification of spam as
+ham (false negative) increases from 67 to 256. By adding more ham-like
+words to the end of spam messages, the attacker can further increase the
+false-negative number. As you see in this example, identifying Bayesian
+poisoning is imperative. The impact of the misclassification depends on
+the domain of the dataset. Especially, applications in medicine and
+security, the costs of false negatives would be very high for the
+patients or businesses. Therefore, special care should be given to the
+diagnosis of Bayesian poisoning.
+
+
+\end{document}
