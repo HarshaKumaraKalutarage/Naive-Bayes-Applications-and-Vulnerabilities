@@ -1,19 +1,16 @@
 ---
-title: "Bayesian poisoning"
-output:
-  pdf_document: default
-  html_document:
-    df_print: paged
-  html_notebook: default
+title: "Bayesian Poisoning"
+graphics: yes
+output: 
+  pdf_document: 
+    keep_tex: true
 ---
 The purpose of this code snippet is to demonstrate to the reader how a Naive Bayes (NB) classiﬁer is vulnerable to Bayesian poisoning attacks.
 Bayesian poisoning is a technique used by email spammers to compromise the eﬀectiveness of Bayesian-based spam ﬁlters by adding non-spamming (ham) like words at the end of a spam message. The aim of spammers is to hamper the probability calculation associated with the NB algorithm. In other words, this increases the type II probability. In hypothesis testing, type II error is referred to as “false negative”, which means not rejecting the null hypothesis when it is false. Therefore, as a result of the Bayesian poisoning, the spammers make the spam filtering system to consider a non-legitimate message a legitimate one. For the implementation of this code,  we use the R language.
 
+**The dataset:** We utilise the dataset at https://www.kaggle.com/venky73/spam-mails-dataset, which contains a collection of labeled spam and non-spam email messages for this purpose. 
 
-
-**The dataset:** We utilise the dataset at https://www.kaggle.com/venky73/spam-mails-dataset for this purpose. 
-
-**Machine learning (ML) task:** Our ML task in this problem would be a classiﬁcation. First, we develop a Bayesian-based spam ﬁlter using the above email repository (raw emails) and then perform a Bayesian poisoning attack to bypass the security control. To this end, we poison the test data into the spam ﬁlter and bypass the security check.
+**Machine learning (ML) task:** Our ML task in this problem would be to identify the characteristics of spam emails and non-spam emails accurately. Thereofore, the aim of this is to seperate a spam email from a non-spam one. This can be considered as a classiﬁcation problem. First, we develop a Bayesian-based spam ﬁlter using the above email repository (raw emails) and then perform a Bayesian poisoning attack to bypass the security control. To this end, we poison the test data into the spam ﬁlter and bypass the security check.
 
 ```{r message=FALSE}
 set.seed(12345) # Set the seed value so that the same result is achieved in each replication
@@ -116,6 +113,7 @@ confusionMatrix(testPredictMsgLabel, testSet$label, positive = "spam") # Print c
 ```
 
 **Bayesian poisoning:** Let's poison the test data to bypass the above spam filter. To this end, randomly selected non-spam messages are ammended at the end of spam messages in our test dataset.
+
 ```{r message=FALSE}
 ### Poison the test data
 spamTestCases <- subset(testSet,label=="spam") # select spams in test cases
@@ -160,5 +158,5 @@ confusionMatrix(poisonedTestPredictMsgLabel, testSet$label, positive = "spam") #
 
 ```
 
-As you can see in the confusion matrix, the misclassification of spam as ham (false negative) increases from 67 to 256. By adding more ham-like words to the end of spam messages, the attacker can further increase the false negative number.
+As you can see in the confusion matrix, the misclassification of spam as ham (false negative) increases from 67 to 256. By adding more ham-like words to the end of spam messages, the attacker can further increase the false-negative number. As you see in this example, identifying Bayesian poisoning is imperative.  The impact of the misclassification depends on the domain of the dataset. Especially, applications in medicine and security, the costs of false negatives would be very high for the patients or businesses. Therefore, special care should be given to the diagnosis of Bayesian poisoning.
 
