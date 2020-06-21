@@ -11,9 +11,9 @@ Bayesian poisoning is a technique used by email spammers to compromise the eﬀe
 
 
 
-**The dataset:** We utilise the dataset at https://www.kaggle.com/venky73/spam-mails-dataset for this purpose. 
+**The dataset:** We utilise the dataset at https://www.kaggle.com/venky73/spam-mails-dataset, which contains a collection of labeled spam and non-spam email messages for this purpose. 
 
-**Machine learning (ML) task:** Our ML task in this problem would be a classiﬁcation. First, we develop a Bayesian-based spam ﬁlter using the above email repository (raw emails) and then perform a Bayesian poisoning attack to bypass the security control. To this end, we poison the test data into the spam ﬁlter and bypass the security check.
+**Machine learning (ML) task:** Our ML task in this problem would be to identify the characteristics of spam emails and non-spam emails accurately. Thereofore, the aim of this is to seperate a spam email from a non-spam one. This can be considered as a classiﬁcation problem. First, we develop a Bayesian-based spam ﬁlter using the above email repository (raw emails) and then perform a Bayesian poisoning attack to bypass the security control. To this end, we poison the test data into the spam ﬁlter and bypass the security check.
 
 ```{r message=FALSE}
 set.seed(12345) # Set the seed value so that the same result is achieved in each replication
@@ -160,5 +160,5 @@ confusionMatrix(poisonedTestPredictMsgLabel, testSet$label, positive = "spam") #
 
 ```
 
-As you can see in the confusion matrix, the misclassification of spam as ham (false negative) increases from 67 to 256. By adding more ham-like words to the end of spam messages, the attacker can further increase the false negative number.
+As you can see in the confusion matrix, the misclassification of spam as ham (false negative) increases from 67 to 256. By adding more ham-like words to the end of spam messages, the attacker can further increase the false-negative number. As you see in this example, identifying Bayesian poisoning is imperative.  The impact of the misclassification depends on the domain of the dataset. Especially, applications in medicine and security, the margin of error is minimal. Therefore, special care should be given to the diagnosis of Bayesian poisoning.
 
