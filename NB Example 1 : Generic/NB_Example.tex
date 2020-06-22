@@ -149,6 +149,7 @@ Irish flower. So, we're tackling a classification task here.
 
 \begin{Shaded}
 \begin{Highlighting}[]
+\KeywordTok{set.seed}\NormalTok{(}\DecValTok{12345}\NormalTok{)}
 \KeywordTok{data}\NormalTok{(iris) }\CommentTok{# Attach the Iris dataset to the R environment}
 \NormalTok{mydata <-}\StringTok{ }\NormalTok{iris }\CommentTok{# Let's rename the dataset as mydata}
 \KeywordTok{dim}\NormalTok{(mydata) }\CommentTok{# check dimensions of mydata}
@@ -264,27 +265,27 @@ priori probabilities for all classes are the same.
 ## Conditional probabilities:
 ##             Sepal.Length
 ## Y              [,1]      [,2]
-##   setosa     4.9800 0.3631769
-##   versicolor 5.8900 0.5042384
-##   virginica  6.6375 0.6019999
+##   setosa     4.9925 0.3377053
+##   versicolor 5.9675 0.5025002
+##   virginica  6.6000 0.6598368
 ## 
 ##             Sepal.Width
 ## Y              [,1]      [,2]
-##   setosa     3.4200 0.3943186
-##   versicolor 2.7800 0.3022989
-##   virginica  3.0025 0.3158119
+##   setosa     3.4050 0.3441452
+##   versicolor 2.7625 0.3263532
+##   virginica  3.0050 0.3396454
 ## 
 ##             Petal.Length
 ## Y              [,1]      [,2]
-##   setosa     1.4475 0.1839558
-##   versicolor 4.2650 0.4907085
-##   virginica  5.5825 0.5439115
+##   setosa     1.4775 0.1640630
+##   versicolor 4.2575 0.4840468
+##   virginica  5.5700 0.5459407
 ## 
 ##             Petal.Width
-## Y              [,1]       [,2]
-##   setosa     0.2350 0.09753369
-##   versicolor 1.3250 0.20223114
-##   virginica  2.0825 0.24166888
+## Y             [,1]      [,2]
+##   setosa     0.245 0.1131144
+##   versicolor 1.345 0.1986493
+##   virginica  2.060 0.2677542
 \end{verbatim}
 
 \textbf{Make predictions:} Now let's apply the above model to assign
@@ -304,31 +305,31 @@ table that is often used to describe the performance of a classifier.
 ##             Reference
 ## Prediction   setosa versicolor virginica
 ##   setosa         10          0         0
-##   versicolor      0         10         4
-##   virginica       0          0         6
+##   versicolor      0         10         1
+##   virginica       0          0         9
 ## 
 ## Overall Statistics
 ##                                           
-##                Accuracy : 0.8667          
-##                  95% CI : (0.6928, 0.9624)
+##                Accuracy : 0.9667          
+##                  95% CI : (0.8278, 0.9992)
 ##     No Information Rate : 0.3333          
-##     P-Value [Acc > NIR] : 2.296e-09       
+##     P-Value [Acc > NIR] : 2.963e-13       
 ##                                           
-##                   Kappa : 0.8             
+##                   Kappa : 0.95            
 ##                                           
 ##  Mcnemar's Test P-Value : NA              
 ## 
 ## Statistics by Class:
 ## 
 ##                      Class: setosa Class: versicolor Class: virginica
-## Sensitivity                 1.0000            1.0000           0.6000
-## Specificity                 1.0000            0.8000           1.0000
-## Pos Pred Value              1.0000            0.7143           1.0000
-## Neg Pred Value              1.0000            1.0000           0.8333
+## Sensitivity                 1.0000            1.0000           0.9000
+## Specificity                 1.0000            0.9500           1.0000
+## Pos Pred Value              1.0000            0.9091           1.0000
+## Neg Pred Value              1.0000            1.0000           0.9524
 ## Prevalence                  0.3333            0.3333           0.3333
-## Detection Rate              0.3333            0.3333           0.2000
-## Detection Prevalence        0.3333            0.4667           0.2000
-## Balanced Accuracy           1.0000            0.9000           0.8000
+## Detection Rate              0.3333            0.3333           0.3000
+## Detection Prevalence        0.3333            0.3667           0.3000
+## Balanced Accuracy           1.0000            0.9750           0.9500
 \end{verbatim}
 
 

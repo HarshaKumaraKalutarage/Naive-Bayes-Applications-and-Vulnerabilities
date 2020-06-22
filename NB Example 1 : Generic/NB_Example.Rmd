@@ -12,6 +12,7 @@ The main purpose of this document is to educate the reader with the practical as
 **Machine learning (ML) task:** In this application, we aim to construct an ML model using NB algorithm to identify (classify) the specie of an Irish flower, based on the values of the four features ( sepal length, sepal width, petal length, and petal width ) of a given Irish flower. So, we're tackling a classification task here.
 
 ```{r message=FALSE}
+set.seed(12345)
 data(iris) # Attach the Iris dataset to the R environment
 mydata <- iris # Let's rename the dataset as mydata
 dim(mydata) # check dimensions of mydata
